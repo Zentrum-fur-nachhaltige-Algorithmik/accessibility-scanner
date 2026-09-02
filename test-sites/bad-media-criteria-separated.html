@@ -1,0 +1,67 @@
+<!-- WCAG-TEST
+criterion: 1.2.1, 1.2.2, 1.2.5
+level: AA
+title: Audio-only and Video-only, Captions, Audio Description
+test_type: bad
+expected_violations: 4
+testable_by: browser
+scanners: media-accessibility
+description: Synchronized media with a transcript but no captions and no audio description, a silent video with no text alternative, and prerecorded audio whose parent merely contains the word transcript. A transcript does not satisfy 1.2.2 or 1.2.5, and video-only content belongs to 1.2.1.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bad: the 1.2.x criteria run together</title>
+<style>
+  body { font-family: sans-serif; margin: 0; color: #1a1a1a; background: #ffffff; }
+  main { padding: 2rem; }
+  section { margin-bottom: 2rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Media library</h1>
+
+  <section id="interview">
+    <h2>The interview</h2>
+    <video id="with-audio" controls width="480">
+      <source src="interview.mp4" type="video/mp4">
+    </video>
+    <div>
+      <h3>Transcript</h3>
+      <p>Interviewer: Welcome to the programme. Today we look at how the new
+      sensor line is assembled, from the first casting to the final test, and
+      what changed in the process this year.</p>
+    </div>
+  </section>
+
+  <section id="assembly">
+    <h2>Assembly, filmed without sound</h2>
+    <video id="silent" controls width="480">
+      <source src="assembly.mp4" type="video/mp4">
+    </video>
+    <p>The film shows the assembly line running at normal speed.</p>
+  </section>
+
+  <section id="podcast">
+    <h2>Episode 12</h2>
+    <audio id="podcast-audio" controls>
+      <source src="episode-12.mp3" type="audio/mpeg">
+    </audio>
+    <p>A transcript of this episode is not available yet.</p>
+  </section>
+</main>
+<script>
+  // The repository ships no media binaries, so the decoded-track state a
+  // browser would report is declared here. Nothing else about the page
+  // depends on it.
+  function fakeAudioTracks(el, count) {
+    Object.defineProperty(el, 'audioTracks', { value: { length: count } });
+  }
+  fakeAudioTracks(document.getElementById('with-audio'), 1);
+  fakeAudioTracks(document.getElementById('silent'), 0);
+</script>
+</body>
+</html>

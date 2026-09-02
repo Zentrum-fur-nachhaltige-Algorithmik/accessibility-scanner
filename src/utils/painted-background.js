@@ -228,6 +228,10 @@ const injectableCode = `
     const stack = [];
     let unresolved = null;
     let unresolvedSource = null;
+    // An image the capture could not load is not evidence that the layer
+    // below it is what the user sees: on the live page it paints, and the
+    // colour under it is the one this browsing session happens to show.
+    let unloadedImage = null;
     let current = element;
 
     while (current && current.nodeType === 1) {
@@ -258,7 +262,10 @@ const injectableCode = `
           const urlMatch = layer.match(/url\\((['"]?)(.*?)\\1\\)/i);
           if (!urlMatch) continue;
           const probe = await __probeBackgroundImage(urlMatch[2]);
-          if (!probe.ok) continue;
+          if (!probe.ok) {
+            if (!unloadedImage) unloadedImage = urlMatch[2].slice(0, 160);
+            continue;
+          }
           const natural = { width: probe.img.naturalWidth, height: probe.img.naturalHeight };
           const painted = __paintedImageRect(styles, box, natural);
           if (painted && !__intersects(painted, target)) continue;
@@ -302,7 +309,7 @@ const injectableCode = `
       for (const base of candidates) for (const c of stack[i].colors) next.push(__blendOver(c, base));
       candidates = __dedupeColors(next).slice(0, 16);
     }
-    return { candidates, unresolved, unresolvedSource, textRect: target };
+    return { candidates, unresolved, unresolvedSource, unloadedImage, textRect: target };
   }
 
   /**
@@ -324,7 +331,8 @@ const injectableCode = `
     }
     const fg = __parseRgb(styles.color);
     if (!fg) return { decision: 'review', reason: 'no computed text colour' };
-    const { candidates, unresolved, unresolvedSource } = await __paintedBackdrops(element);
+    const { candidates, unresolved, unresolvedSource, unloadedImage } =
+      await __paintedBackdrops(element);
     if (!candidates.length) return { decision: 'review', reason: 'no backdrop resolved' };
 
     const large = __isLargeText(styles);
@@ -341,9 +349,14 @@ const injectableCode = `
       if (ratio > max) max = ratio;
     }
 
-    const decision = min >= threshold ? 'pass' : max < threshold ? 'fail' : 'review';
+    let decision = min >= threshold ? 'pass' : max < threshold ? 'fail' : 'review';
+    // A background image that 404s in the capture (a hero photo behind a
+    // headline) leaves the parent colour as the only backdrop, and white text
+    // over it then measures as a failure that does not exist on the live page.
+    if (decision === 'fail' && unloadedImage) decision = 'review';
     return {
       decision,
+      unloadedImage: unloadedImage || null,
       threshold,
       large,
       minRatio: Math.round(min * 100) / 100,

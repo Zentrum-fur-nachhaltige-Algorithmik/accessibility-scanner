@@ -1,0 +1,57 @@
+<!-- WCAG-TEST
+criterion: 1.4.11
+level: AA
+title: Non-text Contrast
+test_type: good
+expected_violations: 0
+testable_by: browser
+scanners: nontext-contrast
+description: A form of native controls the author never styled, on a page background the user agent's default 1px solid rgb(118,118,118) border does not reach 3:1 against. SC 1.4.11 exempts an appearance the user agent determines and the author does not modify, so the three border rules must stay silent.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Good: user-agent default controls</title>
+<style>
+  /* The page is painted; the controls in it are not. */
+  body { font-family: sans-serif; margin: 0; color: #1a1a1a; background: #8a8a8a; }
+  main { padding: 2rem; }
+  label { display: block; margin: 0.75rem 0 0.25rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Registration</h1>
+  <form>
+    <label for="email">E-mail</label>
+    <input id="email" type="email" name="email" autocomplete="email">
+
+    <label for="country">Country</label>
+    <select id="country" name="country">
+      <option>Austria</option>
+      <option>Germany</option>
+    </select>
+
+    <label for="notes">Notes</label>
+    <textarea id="notes" name="notes" rows="3"></textarea>
+
+    <p>
+      <input id="terms" type="checkbox" name="terms">
+      <label for="terms">I accept the terms</label>
+    </p>
+    <p>
+      <input id="post" type="radio" name="contact" value="post">
+      <label for="post">Contact me by post</label>
+    </p>
+    <p>
+      <label for="volume">Volume</label>
+      <input id="volume" type="range" name="volume" min="0" max="10">
+    </p>
+
+    <button type="submit">Register</button>
+  </form>
+</main>
+</body>
+</html>

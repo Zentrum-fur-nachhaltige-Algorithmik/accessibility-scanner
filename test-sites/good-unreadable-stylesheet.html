@@ -1,0 +1,56 @@
+<!-- WCAG-TEST
+criterion: 1.4.1
+level: A
+title: Use of Color
+test_type: good
+expected_violations: 0
+testable_by: browser
+scanners: use-of-color
+description: The stylesheet declaring the hover and focus underline is served from a second origin without CORS, so neither cssRules nor a fetch can read it. link-color-only must ask a reviewer instead of reporting a violation.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Good: hover cue in an unreadable stylesheet</title>
+<script>
+  (function () {
+    var port = Number(location.port || 80) + 1;
+    var href = location.protocol + '//' + location.hostname + ':' + port + '/no-cors-cues.css';
+    // A link whose origin does not answer stays in document.styleSheets as an
+    // opaque sheet, so only its own error event says it did not load.
+    document.write(
+      '<link rel="stylesheet" href="' + href + '" onerror="window.__crossOriginCssFailed = true">'
+    );
+  })();
+</script>
+<style>
+  body { font-family: sans-serif; margin: 0; color: #1a1a1a; background: #ffffff; }
+  main { padding: 2rem; max-width: 40rem; }
+  /* The resting style is colour only; the sheet on the other origin is what
+     adds the underline on hover and on focus. */
+  article a { color: #4a90d9; text-decoration: none; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Departures</h1>
+  <article>
+    <p>Every departure of the day is listed in the <a href="/timetable">printed timetable</a>,
+    and the platform numbers are repeated on the boards in the main hall of the station.</p>
+  </article>
+</main>
+<template id="fallback-css">
+  article a:hover, article a:focus { text-decoration: underline; }
+</template>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    if (!window.__crossOriginCssFailed) return;
+    var style = document.createElement('style');
+    style.textContent = document.getElementById('fallback-css').innerHTML;
+    document.head.appendChild(style);
+  });
+</script>
+</body>
+</html>

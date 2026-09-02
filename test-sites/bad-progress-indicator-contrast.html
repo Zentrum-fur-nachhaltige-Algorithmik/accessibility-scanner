@@ -1,0 +1,48 @@
+<!-- WCAG-TEST
+criterion: 1.4.11
+level: AA
+title: Non-text Contrast
+test_type: bad
+expected_violations: 1
+testable_by: browser
+scanners: nontext-contrast
+description: A custom progress bar whose filled indicator is barely distinguishable from the track it is painted in, so the value the bar shows cannot be perceived. The native <progress> beside it is painted by the user agent, which exposes no colour to measure.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bad: a progress bar whose value is not perceivable</title>
+<style>
+  body { font-family: sans-serif; margin: 0; color: #1a1a1a; background: #ffffff; }
+  main { padding: 2rem; }
+
+  progress {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 320px;
+    height: 16px;
+    border: 1px solid #1a1a1a;
+  }
+  progress::-webkit-progress-bar { background-color: #e0e0e0; }
+  progress::-webkit-progress-value { background-color: #d2d2d2; }
+
+  .bar { width: 320px; height: 16px; background-color: #e0e0e0; border: 1px solid #1a1a1a; }
+  .bar > .fill { width: 40%; height: 100%; background-color: #d2d2d2; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Upload</h1>
+
+  <p><label for="native">Native progress</label></p>
+  <progress id="native" value="70" max="100">70%</progress>
+
+  <p>Custom progress</p>
+  <div class="bar" role="progressbar" aria-label="Upload" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100">
+    <div class="fill"></div>
+  </div>
+</main>
+</body>
+</html>

@@ -4,90 +4,77 @@ level: AA
 title: Identify Input Purpose
 test_type: good
 expected_violations: 0
-testable_by: regex
+testable_by: browser
 scanners: input-purpose
-description: A URL to check, a city and country filter, a language switcher, a document title field and a contact preference radio group, none of which collect the user's own data
+description: A book-title search, a job application asking for the position applied for, a language switcher, and a contact form whose phone and title fields carry a more precise token of the right family. None of these fields collects a datum about the user that the form does not already identify, so missing-autocomplete and wrong-autocomplete must stay silent.
 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Check a page</title>
-    <style>
-        body { font-family: sans-serif; max-width: 800px; margin: 2rem auto; color: #1a1a1a; background: #ffffff; }
-        fieldset { margin: 1.5rem 0; }
-        label { display: block; margin-top: 0.75rem; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Good: fields that are not the user's own data</title>
+<style>
+  body { font-family: sans-serif; margin: 0; color: #1a1a1a; background: #ffffff; }
+  main { padding: 2rem; }
+  fieldset { margin-bottom: 1.5rem; }
+  label { display: block; margin: 0.5rem 0 0.25rem; }
+</style>
 </head>
 <body>
-    <main>
-        <h1>Check a page</h1>
+<main>
+  <h1>Library</h1>
 
-        <!-- The address of somebody else's page, not the user's own -->
-        <form action="/report" method="get">
-            <label for="url">Web page address to check</label>
-            <input type="text" id="url" name="url" placeholder="https://example.org">
-            <button type="submit">Check</button>
-        </form>
+  <form action="/search" method="get">
+    <fieldset>
+      <legend>Search the catalogue</legend>
+      <label for="book-title">Title of the book</label>
+      <input id="book-title" name="title" type="text">
+      <label for="author">Author</label>
+      <input id="author" name="author" type="text">
+      <button type="submit">Search</button>
+    </fieldset>
+  </form>
 
-        <!-- A listing filter: city and country are the search, not the searcher -->
-        <form action="/rooms" method="get">
-            <h2>Find a room</h2>
-            <label for="city">City</label>
-            <select id="city" name="city">
-                <option>Bremen</option>
-                <option>Leipzig</option>
-            </select>
+  <form action="/apply" method="post">
+    <fieldset>
+      <legend>Apply for a job</legend>
+      <label for="vacancy">Position applied for</label>
+      <select id="vacancy" name="position">
+        <option>Librarian</option>
+        <option>Archivist</option>
+      </select>
+      <label for="motivation">Why this job?</label>
+      <textarea id="motivation" name="motivation" rows="3"></textarea>
+      <button type="submit">Apply</button>
+    </fieldset>
+  </form>
 
-            <label for="country">Country</label>
-            <select id="country" name="country">
-                <option>Germany</option>
-                <option>Austria</option>
-            </select>
+  <form action="/language" method="post">
+    <label for="lang">Language</label>
+    <select id="lang" name="language">
+      <option>Deutsch</option>
+      <option>English</option>
+    </select>
+    <button type="submit">Change</button>
+  </form>
 
-            <label for="rooms">Rooms</label>
-            <input type="number" id="rooms" name="rooms" min="1" max="4" value="1">
-            <button type="submit">Search</button>
-        </form>
-
-        <!-- Site language, not the user's language preference record -->
-        <form action="/language" method="post">
-            <label for="language">Site language</label>
-            <select id="language" name="language">
-                <option>English</option>
-                <option>Deutsch</option>
-            </select>
-            <button type="submit">Apply</button>
-        </form>
-
-        <!-- A document's title and organization, entered about a third party -->
-        <form action="/records" method="post">
-            <h2>Add a record</h2>
-            <label for="doc-title">Title</label>
-            <input type="text" id="doc-title" name="title">
-
-            <label for="publisher">Organization</label>
-            <input type="text" id="publisher" name="organization">
-            <button type="submit">Save</button>
-        </form>
-
-        <!-- A preference, not a datum to autofill -->
-        <form action="/preferences" method="post">
-            <fieldset>
-                <legend>Preferred contact method</legend>
-                <label><input type="radio" name="contact" value="email"> Email</label>
-                <label><input type="radio" name="contact" value="phone"> Phone</label>
-            </fieldset>
-            <button type="submit">Save</button>
-        </form>
-
-        <!-- Site search -->
-        <form action="/search" method="get" role="search">
-            <label for="q">Search the site</label>
-            <input type="search" id="q" name="q">
-            <button type="submit">Search</button>
-        </form>
-    </main>
+  <form action="/contact" method="post">
+    <fieldset>
+      <legend>Contact us</legend>
+      <label for="given">First name</label>
+      <input id="given" name="fname" type="text" autocomplete="given-name">
+      <label for="family">Last name</label>
+      <input id="family" name="lname" type="text" autocomplete="family-name">
+      <label for="salutation">Titel</label>
+      <input id="salutation" name="title" type="text" autocomplete="honorific-prefix">
+      <label for="area">Phone, area code</label>
+      <input id="area" name="phone_area" type="text" autocomplete="tel-area-code">
+      <label for="local">Phone, local part</label>
+      <input id="local" name="phone_local" type="text" autocomplete="tel-local-prefix">
+      <button type="submit">Send</button>
+    </fieldset>
+  </form>
+</main>
 </body>
 </html>

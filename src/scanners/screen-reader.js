@@ -1,16 +1,18 @@
 /**
  * Screen Reader Scanner.
  * WCAG 1.3.1, 2.4.1 (EN 301 549 9.1.3.1, 9.2.4.1).
- * Reports the two structural defects axe-core has no rule for: a data table
- * with no header cells, and a repeated block of navigation with no way past it.
- * Heading structure and landmarks are analysed for the report payload only.
+ * Reports the one structural defect axe-core has no rule for: a data table
+ * that presents a header row or column without marking it up. Bypass Blocks is
+ * axe-core's `bypass`, heading structure and landmarks are analysed for the
+ * report payload only.
  */
 const BaseScanner = require('../core/base-scanner');
 
 class ScreenReaderScanner extends BaseScanner {
   constructor() {
     super('screen-reader', {
-      wcagCriteria: ['1.3.1', '2.4.1'],
+      // 2.4.1 is axe-core's `bypass`, see calculateEUCompliance.
+      wcagCriteria: ['1.3.1'],
       wcagPrinciple: 'perceivable',
     });
   }
@@ -306,9 +308,6 @@ class ScreenReaderScanner extends BaseScanner {
         //   (b) a visually emphasised first row (bold/strong or its own
         //       background): a header row the author drew but did not mark up
         //       (WCAG F91);
-        //   (c) three or more columns: each cell's meaning then depends on
-        //       its column, and the column's meaning is conveyed visually by
-        //       the top row.
         const hasSpans = Array.from(table.querySelectorAll('td, th')).some(
           (c) => c.colSpan > 1 || c.rowSpan > 1
         );
@@ -329,7 +328,30 @@ class ScreenReaderScanner extends BaseScanner {
               (rowBg !== bodyRowBg && rowBg !== 'rgba(0, 0, 0, 0)');
             return bold || distinctBg;
           });
-        const presentsHeaderAxis = hasSpans || firstRowEmphasised || maxCols >= 3;
+        // A first COLUMN drawn as a header is the same defect turned sideways.
+        const firstColumnCells = rows.map((row) => row.cells[0]).filter(Boolean);
+        const bodyColumnBg =
+          rows[0] && rows[0].cells[1]
+            ? window.getComputedStyle(rows[0].cells[1]).backgroundColor
+            : '';
+        const firstColumnEmphasised =
+          firstColumnCells.length > 1 &&
+          maxCols >= 2 &&
+          firstColumnCells.every((c) => {
+            const cs = window.getComputedStyle(c);
+            const bold = parseInt(cs.fontWeight, 10) >= 600 || !!c.querySelector('strong, b');
+            const ownBg = cs.backgroundColor;
+            const distinctBg = ownBg !== bodyColumnBg && ownBg !== 'rgba(0, 0, 0, 0)';
+            return bold || distinctBg;
+          });
+
+        // The lost relationship has to be one the page actually presents. A
+        // table whose first row is drawn as a header (bold, its own shading)
+        // or whose cells are merged conveys a header axis visually and
+        // programmatically to nobody. A plain three-column list of values
+        // with no header row presents no header to lose, and requiring <th>
+        // there flags healthy markup.
+        const presentsHeaderAxis = hasSpans || firstRowEmphasised || firstColumnEmphasised;
 
         if (headerCells.length === 0 && presentsHeaderAxis) {
           problematic.push({
@@ -393,34 +415,10 @@ class ScreenReaderScanner extends BaseScanner {
       score -= 10;
     }
 
-    // SC 2.4.1 Bypass Blocks. Evidence-gated: only when a repeated
-    // navigation block exists at the top of the page and no bypass mechanism
-    // (main landmark or a working skip link) is available.
-    const bypass = analysisResults.landmarks.bypass;
-    if (bypass && bypass.repeatedBlock && !bypass.satisfied) {
-      violations.push(
-        V({
-          criterion: '9.2.4.1',
-          type: 'missing-skip-link',
-          element:
-            bypass.repeatedBlock.tag +
-            (bypass.repeatedBlock.id ? `#${bypass.repeatedBlock.id}` : ''),
-          description: `Bypass Blocks - a <${bypass.repeatedBlock.tag}> navigation block with ${bypass.repeatedBlock.linkCount} links precedes the page content, but there is no way to skip it`,
-          severity: 'high',
-          suggestion:
-            'Add a skip link whose target id exists (and is focusable), or wrap the page content in <main>',
-          details: [
-            `Navigation block: <${bypass.repeatedBlock.tag}> with ${bypass.repeatedBlock.linkCount} links`,
-            `Main landmark: ${bypass.hasMainLandmark ? 'present' : 'absent'}`,
-            `Skip links before the block: ${bypass.skipLinkCandidates} (working: ${bypass.workingSkipLinks})`,
-            ...(bypass.brokenSkipLinks.length
-              ? [`Broken skip-link targets: ${bypass.brokenSkipLinks.join(', ')}`]
-              : []),
-          ],
-        })
-      );
-      score -= 10;
-    }
+    // SC 2.4.1 Bypass Blocks is axe-core's `bypass` (tags wcag2a, wcag241),
+    // which runs in the same audit and additionally accepts the heading
+    // mechanism (H69) this rule did not, so it fired on pages axe passes.
+    // The bypass analysis stays in the result payload for the report.
 
     const accessibilityStatement = false; // Would need to check for actual statement
     const contactMechanism = false; // Would need to check for contact info

@@ -10,6 +10,7 @@ const BaseScanner = require('../core/base-scanner');
 const { tabWalk, cleanupTabWalk } = require('../utils/keyboard-focus');
 const { injectableCode: contrastUtils } = require('../utils/browser-contrast');
 const { injectableCode: renderedUtils } = require('../utils/rendered');
+const { injectableCode: styleSheetUtils } = require('../utils/stylesheets');
 
 class NonTextContrastScanner extends BaseScanner {
   constructor() {
@@ -156,6 +157,78 @@ class NonTextContrastScanner extends BaseScanner {
          *    standard accessible pattern (white input, white page, dark
          *    border) otherwise fails for no reason.
          */
+        // SC 1.4.11 does not apply where "the appearance of the component is
+        // determined by the user agent and not modified by the author". The
+        // reference is the same control with no author CSS on it: one of each
+        // kind is built inside a shadow root, where the page's own rules do
+        // not reach, and its computed boundary is the user-agent default.
+        const probeCache = new Map();
+        const PROBE_PROPS = [
+          'borderTopColor',
+          'borderRightColor',
+          'borderBottomColor',
+          'borderLeftColor',
+          'borderTopWidth',
+          'borderRightWidth',
+          'borderBottomWidth',
+          'borderLeftWidth',
+          'borderTopStyle',
+          'borderRightStyle',
+          'borderBottomStyle',
+          'borderLeftStyle',
+          'backgroundColor',
+          'backgroundImage',
+        ];
+
+        function probeStyle(element) {
+          const tag = element.tagName.toLowerCase();
+          const type = (element.getAttribute('type') || '').toLowerCase();
+          const key = tag + '|' + type;
+          if (probeCache.has(key)) return probeCache.get(key);
+          let snapshot = null;
+          try {
+            const host = document.createElement('div');
+            host.style.cssText =
+              'position:absolute;left:-9999px;top:0;width:0;height:0;overflow:hidden';
+            document.body.appendChild(host);
+            const root = host.attachShadow({ mode: 'open' });
+            const probe = document.createElement(tag);
+            if (type) probe.setAttribute('type', type);
+            root.appendChild(probe);
+            const styles = window.getComputedStyle(probe);
+            snapshot = {};
+            for (const prop of PROBE_PROPS) snapshot[prop] = styles[prop];
+            snapshot.appearance = styles.appearance || styles.webkitAppearance || '';
+            host.remove();
+          } catch (e) {
+            snapshot = null;
+          }
+          probeCache.set(key, snapshot);
+          return snapshot;
+        }
+
+        function isUserAgentDefault(element, styles) {
+          const probe = probeStyle(element);
+          if (!probe) return false;
+          for (const prop of PROBE_PROPS) {
+            if (styles[prop] !== probe[prop]) return false;
+          }
+          return true;
+        }
+
+        // A native checkbox, radio or range is painted by the user agent, not
+        // from its CSS box, so its computed border and background say nothing
+        // about what is on the screen. Only once the author has taken the
+        // painting over (appearance: none) is there an authored appearance to
+        // measure.
+        const UA_PAINTED = new Set(['checkbox', 'radio', 'range']);
+        function isUserAgentPainted(element, styles) {
+          if (element.tagName !== 'INPUT') return false;
+          if (!UA_PAINTED.has((element.getAttribute('type') || '').toLowerCase())) return false;
+          const appearance = styles.appearance || styles.webkitAppearance || '';
+          return appearance !== 'none';
+        }
+
         function evaluateComponent(element, index, config) {
           // SC 1.4.11 exception: inactive user interface components.
           if (__isInactive(element)) return;
@@ -164,6 +237,10 @@ class NonTextContrastScanner extends BaseScanner {
           if (!__isRendered(element)) return;
 
           const styles = window.getComputedStyle(element);
+          // SC 1.4.11 exception: an appearance the user agent determined and
+          // the author did not modify.
+          if (isUserAgentPainted(element, styles)) return;
+          if (isUserAgentDefault(element, styles)) return;
           const background = __resolveBackground(element.parentElement || element);
 
           if (background.indeterminate) {
@@ -423,43 +500,104 @@ class NonTextContrastScanner extends BaseScanner {
           }
         }
 
-        // Progress bars: the track boundary is the information that has to
-        // be perceivable. Canvas contents cannot be read from the CSSOM at
-        // all, so canvases are reported as needing review.
+        // Progress bars: what conveys the value is the filled indicator
+        // against the track it sits in, so that is what is measured. The
+        // outer border is not the information the criterion is about, and a
+        // progress bar drawn with no border at all still conveys its value.
+        function progressParts(el) {
+          if (el.tagName === 'PROGRESS') {
+            const value = window.getComputedStyle(el, '::-webkit-progress-value').backgroundColor;
+            const track = window.getComputedStyle(el, '::-webkit-progress-bar').backgroundColor;
+            return value && track ? { value, track, part: 'value' } : null;
+          }
+          const box = el.getBoundingClientRect();
+          if (!(box.width > 0)) return null;
+          // The indicator of a custom progress bar is the child that is
+          // narrower (or shorter) than the track it is painted in.
+          for (const child of el.children) {
+            const rect = child.getBoundingClientRect();
+            if (!(rect.width > 0) || !(rect.height > 0)) continue;
+            if (rect.width >= box.width * 0.99 && rect.height >= box.height * 0.99) continue;
+            return {
+              value: window.getComputedStyle(child).backgroundColor,
+              track: window.getComputedStyle(el).backgroundColor,
+              part: 'indicator',
+            };
+          }
+          return null;
+        }
+
         const progressBars = document.querySelectorAll('progress, [role="progressbar"]');
         for (let i = 0; i < progressBars.length; i++) {
           const progress = progressBars[i];
           if (__isInactive(progress)) continue;
-          const styles = window.getComputedStyle(progress);
           const background = __resolveBackground(progress.parentElement || progress);
           if (background.indeterminate) continue;
           const backdrop = { r: background.r, g: background.g, b: background.b, a: 1 };
-          const renderedBorder = __getRenderedBorder(styles);
-          if (!renderedBorder) continue;
 
-          const contrast = ratioAgainst(renderedBorder.color, backdrop);
-          if (contrast !== null && contrast < contrastThreshold) {
+          const parts = progressParts(progress);
+          if (!parts) continue;
+          const valueRgb = __parseRgb(parts.value);
+          const trackRgb = __parseRgb(parts.track);
+          // A native <progress> is painted by the user agent: Chromium
+          // exposes no colour for ::-webkit-progress-value or -bar, so there
+          // is nothing to measure and nothing the author modified.
+          if (!valueRgb || !trackRgb || valueRgb.a === 0 || trackRgb.a === 0) continue;
+          // The track can be translucent, so both layers are composited onto
+          // the backdrop before the ratio is taken.
+          const flattenedTrack = __blendOver(trackRgb, backdrop);
+          const flattenedValue = __blendOver(valueRgb, flattenedTrack);
+          const contrast = __getContrastRatio(flattenedValue, flattenedTrack);
+
+          if (contrast < contrastThreshold) {
             violations.push({
               type: 'insufficient-progress-border-contrast',
               category: 'ui-component',
               severity: 'moderate',
-              element: progress.id ? `progress#${progress.id}` : `progress[${i}]`,
-              description: 'Progress bar border has insufficient contrast',
+              element: progress.id
+                ? `${progress.tagName.toLowerCase()}#${progress.id}`
+                : `${progress.tagName.toLowerCase()}[${i}]`,
+              description:
+                'The filled part of the progress bar is not distinguishable from its track',
               details: {
-                borderColor: renderedBorder.color,
+                indicatorColor: parts.value,
+                trackColor: parts.track,
+                measuredPart: parts.part,
                 backgroundColor: rgbString(backdrop),
                 contrastRatio: Math.round(contrast * 100) / 100,
                 required: contrastThreshold,
                 id: progress.id || null,
               },
               wcagCriteria: '1.4.11',
-              impact: 'Progress bar boundaries are not clearly visible',
+              impact: 'The value the progress bar shows cannot be perceived',
             });
           }
         }
 
+        // A canvas is only in scope when it is a graphical object required to
+        // understand the content: it is named, it is the figure of a caption,
+        // or it is painted larger than an icon. A decorative canvas (a blur
+        // blob, a particle background) raises no question.
+        function isMeaningfulCanvas(canvas) {
+          if (canvas.getAttribute('aria-hidden') === 'true') return false;
+          const role = canvas.getAttribute('role');
+          if (role === 'presentation' || role === 'none') return false;
+          const named = !!(
+            (canvas.getAttribute('aria-label') || '').trim() ||
+            canvas.getAttribute('aria-labelledby') ||
+            (canvas.getAttribute('title') || '').trim() ||
+            (canvas.textContent || '').trim()
+          );
+          if (named) return true;
+          const figure = canvas.closest('figure');
+          if (figure && figure.querySelector('figcaption')) return true;
+          const rect = canvas.getBoundingClientRect();
+          return rect.width > 64 && rect.height > 64;
+        }
+
         const canvases = document.querySelectorAll('canvas');
         for (let i = 0; i < canvases.length; i++) {
+          if (!isMeaningfulCanvas(canvases[i])) continue;
           incomplete.push({
             type: 'canvas-contrast-not-determinable',
             category: 'graphical-object',
@@ -592,14 +730,19 @@ class NonTextContrastScanner extends BaseScanner {
    */
   async analyzeInteractiveStates(page, options) {
     return await page.evaluate(
-      (contrastThreshold, contrastCode) => {
+      async (contrastThreshold, contrastCode, styleSheetCode) => {
         eval(contrastCode);
+        eval(styleSheetCode);
 
         const violations = [];
 
         // Pseudo-classes / attribute selectors that signal a semantic state.
+        // aria-current is not one: it is a property saying which item of a set
+        // is the current one, not a state the user sets, and a nav item marked
+        // current by colour alone is the SC 1.4.1 case that use-of-color and
+        // axe link-in-text-block own.
         const STATE_PATTERN =
-          /:checked|:indeterminate|\[aria-checked|\[aria-selected|\[aria-pressed|\[aria-expanded|\[aria-current/;
+          /:checked|:indeterminate|\[aria-checked|\[aria-selected|\[aria-pressed|\[aria-expanded/;
         // Properties whose change can constitute a visible state indicator.
         const COLOUR_PROPS = [
           'background-color',
@@ -628,18 +771,43 @@ class NonTextContrastScanner extends BaseScanner {
           'opacity',
         ];
 
-        // Strip state pseudo-classes/attributes so the remaining selector can
-        // be matched against the live element.
+        // Strip the state pseudo-classes so the rest of the selector can be
+        // matched against the live element. Attribute selectors keep their
+        // VALUE: `[aria-expanded="false"]` is what tells the scan that the
+        // rule describes the collapsed state, and an element that currently
+        // matches it is already wearing that style, so there is nothing to
+        // compare its resting colour with.
         function baseSelector(selectorText) {
           return selectorText
             .replace(/:(checked|indeterminate)\b/g, '')
-            .replace(/\[aria-(checked|selected|pressed|expanded|current)(=("|')?[^\]]*)?\]/g, '')
+            .replace(/\[aria-(checked|selected|pressed|expanded)\]/g, '')
             .trim();
         }
 
-        function collectStateRules() {
+        // The selector with every state token removed: which elements the
+        // rule is about at all.
+        function statelessSelector(selectorText) {
+          return selectorText
+            .replace(/:(checked|indeterminate)\b/g, '')
+            .replace(/\[aria-(checked|selected|pressed|expanded)(=("|')?[^\]]*)?\]/g, '')
+            .trim();
+        }
+
+        // CSS specificity of one compound selector, as the (id, class, type)
+        // triple, so the declaration the cascade would apply is the one read.
+        function specificity(selector) {
+          const ids = (selector.match(/#[\w-]+/g) || []).length;
+          const classes = (selector.match(/\.[\w-]+|\[[^\]]*\]|:(?!:)[\w-]+/g) || []).length;
+          const types = (selector.match(/(^|[\s>+~])[a-zA-Z][\w-]*/g) || []).length;
+          return ids * 10000 + classes * 100 + types;
+        }
+
+        async function collectStateRules() {
           const out = [];
-          for (const sheet of Array.from(document.styleSheets)) {
+          // Cross-origin sheets are fetched and parsed, so a state colour
+          // declared in a stylesheet on a CDN is measured like any other.
+          const { sheets } = await __readStyleSheets();
+          for (const sheet of sheets) {
             let rules;
             try {
               rules = Array.from(sheet.cssRules || []);
@@ -651,6 +819,18 @@ class NonTextContrastScanner extends BaseScanner {
             // rules, not by having the property.
             const walk = (list) => {
               for (const rule of list) {
+                // A declaration inside a media query the viewport does not
+                // match is not applied, so it indicates no state here.
+                if (rule.media && rule.cssRules) {
+                  let applies = true;
+                  try {
+                    applies = window.matchMedia(rule.media.mediaText).matches;
+                  } catch (e) {
+                    applies = true;
+                  }
+                  if (applies) walk(Array.from(rule.cssRules));
+                  continue;
+                }
                 if (rule.cssRules && rule.cssRules.length) walk(Array.from(rule.cssRules));
                 if (!rule.selectorText || !rule.style) continue;
                 if (!STATE_PATTERN.test(rule.selectorText)) continue;
@@ -658,11 +838,14 @@ class NonTextContrastScanner extends BaseScanner {
                   const state = STATE_PATTERN.exec(part);
                   if (!state) continue;
                   const base = baseSelector(part);
-                  if (!base) continue;
+                  const stateless = statelessSelector(part);
+                  if (!base || !stateless) continue;
                   out.push({
                     base: base,
+                    stateless: stateless,
                     style: rule.style,
                     selectorText: part.trim(),
+                    specificity: specificity(part),
                     state: state[0].replace(/^[:[]/, ''),
                   });
                 }
@@ -673,7 +856,7 @@ class NonTextContrastScanner extends BaseScanner {
           return out;
         }
 
-        const stateRules = collectStateRules();
+        const stateRules = await collectStateRules();
         if (stateRules.length === 0) return { violations: violations, incomplete: [] };
 
         const candidates = document.querySelectorAll(
@@ -699,15 +882,20 @@ class NonTextContrastScanner extends BaseScanner {
           return element.hasAttribute(state);
         }
 
-        // The declaration that wins is the one the cascade applies last, so
-        // every matching rule is merged in stylesheet order instead of
-        // stopping at the first match.
+        // The declaration that wins is the one the cascade applies: the
+        // highest specificity, and among equals the one declared last.
         function declaredValue(rules, prop) {
-          for (let r = rules.length - 1; r >= 0; r--) {
-            const value = rules[r].style.getPropertyValue(prop);
-            if (value) return value;
+          let best = '';
+          let bestSpecificity = -1;
+          for (const rule of rules) {
+            const value = rule.style.getPropertyValue(prop);
+            if (!value) continue;
+            if (rule.specificity >= bestSpecificity) {
+              bestSpecificity = rule.specificity;
+              best = value;
+            }
           }
-          return '';
+          return best;
         }
 
         for (let i = 0; i < Math.min(candidates.length, 40); i++) {
@@ -715,15 +903,25 @@ class NonTextContrastScanner extends BaseScanner {
           if (__isInactive(element)) continue;
 
           const matchedRules = [];
+          let wearsStateStyle = false;
           for (const rule of stateRules) {
             try {
-              if (element.matches(rule.base) && exposesState(element, rule.state)) {
-                matchedRules.push(rule);
+              if (!element.matches(rule.stateless)) continue;
+              if (!exposesState(element, rule.state)) continue;
+              // The element is currently in the state this rule describes, so
+              // its computed style IS the state style. Comparing the two
+              // yields 1:1 and says nothing; the resting style is not
+              // observable without changing the element.
+              if (element.matches(rule.base)) {
+                wearsStateStyle = true;
+                continue;
               }
+              matchedRules.push(rule);
             } catch (e) {
               /* invalid/unsupported selector */
             }
           }
+          if (wearsStateStyle) continue;
           if (matchedRules.length === 0) continue;
           const matched = matchedRules[matchedRules.length - 1];
 
@@ -796,7 +994,8 @@ class NonTextContrastScanner extends BaseScanner {
         return { violations: violations, incomplete: [] };
       },
       options.contrastThreshold,
-      contrastUtils
+      contrastUtils,
+      styleSheetUtils
     );
   }
 

@@ -1,0 +1,50 @@
+<!-- WCAG-TEST
+criterion: 1.4.11
+level: AA
+title: Non-text Contrast
+test_type: good
+expected_violations: 0
+testable_by: browser
+scanners: nontext-contrast
+description: Progress bars whose filled indicator stands out from its track while the hairline around the track does not reach 3:1. The value is what SC 1.4.11 asks to be perceivable, and it is, so insufficient-progress-border-contrast must stay silent.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Good: a progress bar whose value is perceivable</title>
+<style>
+  body { font-family: sans-serif; margin: 0; color: #1a1a1a; background: #ffffff; }
+  main { padding: 2rem; }
+
+  /* A decorative hairline around the track: 1.2:1 against the page, and not
+     what conveys the value. */
+  progress {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 320px;
+    height: 16px;
+    border: 1px solid #e6e6e6;
+  }
+  progress::-webkit-progress-bar { background-color: #ffffff; }
+  progress::-webkit-progress-value { background-color: #1f4e79; }
+
+  .bar { width: 320px; height: 16px; background-color: #ffffff; border: 1px solid #e6e6e6; }
+  .bar > .fill { width: 40%; height: 100%; background-color: #1f4e79; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Upload</h1>
+
+  <p><label for="native">Native progress</label></p>
+  <progress id="native" value="70" max="100">70%</progress>
+
+  <p>Custom progress</p>
+  <div class="bar" role="progressbar" aria-label="Upload" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100">
+    <div class="fill"></div>
+  </div>
+</main>
+</body>
+</html>

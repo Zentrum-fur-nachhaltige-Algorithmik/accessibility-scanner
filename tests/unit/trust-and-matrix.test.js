@@ -89,4 +89,44 @@ describe('the coverage matrix says how each criterion is decided', () => {
       for (const rule of neverRun) expect(row.axeRules, row.sc).not.toContain(rule);
     }
   });
+
+  it('credits no criterion to a rule axe buckets as a best practice only', () => {
+    // Those rules bear on real clauses (empty-heading, heading-order, region,
+    // skip-link, tabindex, ...), but the adapter routes them to advice and
+    // they carry no wcag tag, so the matrix must not call their criteria
+    // covered either.
+    const axe = require('axe-core');
+    const bestPracticeOnly = new Set(
+      axe
+        .getRules()
+        .filter((r) => r.tags.includes('best-practice') && !r.tags.some((t) => /^wcag/.test(t)))
+        .map((r) => r.ruleId)
+    );
+    expect(bestPracticeOnly.size).toBeGreaterThan(0);
+    for (const row of rows) {
+      for (const rule of row.axeRules || []) {
+        expect(bestPracticeOnly.has(rule), `${row.sc} credited to ${rule}`).toBe(false);
+      }
+    }
+  });
+});
+
+describe('the axe adapter asks for the tags the audit claims', () => {
+  const { AXE_TAGS } = require('../../src/scanners/axe-core');
+
+  it('asks for every WCAG 2.0 to 2.2 A and AA tag', () => {
+    for (const tag of ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22a', 'wcag22aa']) {
+      expect(AXE_TAGS).toContain(tag);
+    }
+  });
+
+  it('leaves axe experimental and deprecated rules excluded', () => {
+    // The user decided on 2026-09-02 not to enable them. tagExclude is axe's
+    // own default and this adapter does not override it, so the seven rules
+    // it holds back stay out of the audit and out of the coverage matrix.
+    const axe = require('axe-core');
+    expect(axe._audit.tagExclude).toEqual(['experimental', 'deprecated']);
+    expect(AXE_TAGS).not.toContain('experimental');
+    expect(AXE_TAGS).not.toContain('deprecated');
+  });
 });

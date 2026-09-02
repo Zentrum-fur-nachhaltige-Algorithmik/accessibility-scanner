@@ -47,6 +47,9 @@ class MediaAccessibilityScanner extends BaseScanner {
       criteria: ['9.1.1.1', '9.1.2.1', '9.1.2.2', '9.1.2.3', '9.1.2.5'],
       passed: mediaResults.violations.length === 0,
       violations: mediaResults.violations,
+      // Contradictory decorative markup, a data graphic with a short alt and
+      // a video whose audio track could not be read: questions, not findings.
+      needsReview: mediaResults.needsReview,
       summary: {
         totalImages: mediaResults.totalImages,
         totalVideos: mediaResults.totalVideos,
@@ -54,6 +57,7 @@ class MediaAccessibilityScanner extends BaseScanner {
         totalAudio: mediaResults.totalAudio,
         audioWithoutTranscripts: mediaResults.audioWithoutTranscripts,
         totalCanvases: mediaResults.totalCanvases,
+        openQuestions: mediaResults.needsReview.length,
       },
       screenshotPath: scanDir,
       visualEvidence: mediaResults.visualEvidence,
@@ -91,12 +95,17 @@ class MediaAccessibilityScanner extends BaseScanner {
         return `${tagName}${id}${className}`;
       }
 
+      // "Transcript", in the words a page uses for one. The word has to name
+      // the link or the section, not merely occur somewhere in the subtree
+      // around the media: "a transcript is not available" contains it too.
+      const TRANSCRIPT_WORDS = /transcript|transkript|mitschrift|abschrift|volltext/i;
+
       /**
        * A media element ships an "alternative for time-based media" when a
        * substantive text description is programmatically associated with it
-       * (aria-describedby) or a transcript container sits in the same block.
-       * This is the mechanism WCAG 1.2.1 accepts for video-only content and
-       * the "media alternative" route of 1.2.3.
+       * (aria-describedby), or a link or section NAMED as a transcript sits
+       * beside it. This is the mechanism WCAG 1.2.1 accepts for audio-only and
+       * video-only content and the "media alternative" route of 1.2.3.
        */
       function hasTimeBasedTextAlternative(el) {
         const MIN_ALT_LENGTH = 80; // a real description, not a caption/label
@@ -115,21 +124,74 @@ class MediaAccessibilityScanner extends BaseScanner {
           }
         }
 
-        // Transcript / text-alternative container in the same content block.
         const scope =
           el.closest('section, article, figure, .media-section, .media-container') ||
           el.parentElement;
-        if (scope) {
-          const candidates = scope.querySelectorAll(
-            '[class*="transcript"], [id*="transcript"], [class*="text-alternative"], [id*="text-alternative"], [class*="audiodesc"], [class*="audio-desc"]'
-          );
-          for (const candidate of candidates) {
-            if (candidate === el || el.contains(candidate)) continue;
-            if (candidate.textContent.trim().length >= MIN_ALT_LENGTH) return true;
-          }
+        if (!scope) return false;
+
+        // A link to the transcript: its own text or its accessible name says so.
+        for (const link of scope.querySelectorAll('a[href]')) {
+          const name = [
+            link.textContent || '',
+            link.getAttribute('aria-label') || '',
+            link.getAttribute('title') || '',
+          ].join(' ');
+          if (TRANSCRIPT_WORDS.test(name)) return true;
+        }
+
+        // A section or disclosure named as the transcript, carrying real text.
+        const named = scope.querySelectorAll(
+          'section, article, div, details, aside, figure, [role="region"]'
+        );
+        for (const candidate of named) {
+          if (candidate === el || el.contains(candidate)) continue;
+          const heading = candidate.querySelector('h1, h2, h3, h4, h5, h6, summary, legend');
+          const name = [
+            heading ? heading.textContent : '',
+            candidate.getAttribute('aria-label') || '',
+          ].join(' ');
+          if (!TRANSCRIPT_WORDS.test(name)) continue;
+          if (candidate.textContent.trim().length >= MIN_ALT_LENGTH) return true;
         }
 
         return false;
+      }
+
+      /** Captions a JS player added count: they are read off textTracks. */
+      function trackKinds(el) {
+        const kinds = new Set();
+        for (const track of el.querySelectorAll('track')) {
+          kinds.add((track.getAttribute('kind') || 'subtitles').toLowerCase());
+        }
+        const list = el.textTracks;
+        if (list && typeof list.length === 'number') {
+          for (let i = 0; i < list.length; i++) {
+            if (list[i] && list[i].kind) kinds.add(String(list[i].kind).toLowerCase());
+          }
+        }
+        return kinds;
+      }
+
+      /**
+       * Live media is outside 1.2.1, 1.2.2 (prerecorded) and 1.2.3/1.2.5: a
+       * stream has no duration, and a live source is declared as one.
+       */
+      function isLiveMedia(el) {
+        if (el.duration === Infinity) return true;
+        const sources = [el.getAttribute('src') || ''];
+        for (const source of el.querySelectorAll('source')) {
+          sources.push(source.getAttribute('src') || '', source.getAttribute('type') || '');
+        }
+        const joined = sources.join(' ').toLowerCase();
+        if (/\.m3u8|\.mpd|application\/x-mpegurl|dash\+xml/.test(joined)) return true;
+        const label = [
+          el.getAttribute('aria-label') || '',
+          typeof el.className === 'string' ? el.className : '',
+          el.id || '',
+        ]
+          .join(' ')
+          .toLowerCase();
+        return /\blive\b|livestream|\bstream\b/.test(label);
       }
 
       /**
@@ -156,6 +218,8 @@ class MediaAccessibilityScanner extends BaseScanner {
       const isDecorativeBackgroundVideo = __isDecorativeBackgroundVideo;
 
       const allIssues = [];
+      // What the page cannot decide: carried with what was measured.
+      const allQuestions = [];
       const mediaCounts = {
         totalImages: 0,
         totalVideos: 0,
@@ -170,22 +234,50 @@ class MediaAccessibilityScanner extends BaseScanner {
       mediaCounts.totalImages = images.length;
 
       const FILE_NAME_ALT = /^[\w %+.-]+\.(jpe?g|png|gif|webp|avif|svg|bmp)$/i;
-      // Whole words only: "photograph", "infographics" and a BEM class ending
-      // in "-paragraph" all contain "graph" without being a data visualisation.
-      const COMPLEX_WORDS = ['chart', 'charts', 'graph', 'graphs', 'diagram', 'diagrams'];
-      const namesComplexImage = (value) =>
-        String(value || '')
-          .toLowerCase()
-          .split(/[^a-z]+/)
-          .some((word) => COMPLEX_WORDS.includes(word));
+
+      /**
+       * The image is the only content of a control its author named, which is
+       * the icon-in-labelled-button case: the control carries the name, the
+       * icon is never announced on its own, and its filename alt is harmless.
+       * The same gate the axe adapter applies to image-alt.
+       */
+      function isSoleIconOfNamedControl(img) {
+        const control = img.closest(
+          'button, a[href], [role="button"], [role="link"], input, summary'
+        );
+        if (!control) return false;
+        const labelledby = (control.getAttribute('aria-labelledby') || '')
+          .split(/\s+/)
+          .filter(Boolean)
+          .some((id) => document.getElementById(id));
+        const named = (control.getAttribute('aria-label') || '').trim().length > 0 || labelledby;
+        if (!named) return false;
+        if ((control.textContent || '').trim().length > 0) return false;
+        return control.querySelectorAll('img').length === 1;
+      }
+
+      /**
+       * Evidence that the image carries more information than a short alt can
+       * hold: the author put it in a figure and the caption says it is a
+       * chart, a diagram, a map or a plan. A filename, a class name and a
+       * pixel size are not that evidence.
+       */
+      const COMPLEX_CAPTION =
+        /\b(chart|charts|graph|graphs|diagram|diagramm|diagramme|map|karte|plan|schema|infographic|infografik|abbildung)\b/i;
+      function complexityEvidence(img) {
+        const figure = img.closest('figure');
+        if (!figure) return null;
+        const caption = figure.querySelector('figcaption');
+        if (!caption) return null;
+        const text = caption.textContent.trim();
+        if (!COMPLEX_CAPTION.test(text)) return null;
+        return text.substring(0, 160);
+      }
 
       images.forEach((img) => {
         const selector = getElementSelector(img);
         const alt = img.getAttribute('alt');
         const src = img.getAttribute('src') || '';
-        const className = typeof img.className === 'string' ? img.className : '';
-        const id = img.id || '';
-
         if (img.offsetParent === null) return;
 
         const role = img.getAttribute('role');
@@ -194,13 +286,23 @@ class MediaAccessibilityScanner extends BaseScanner {
         // role="presentation" removes the image from the accessibility tree,
         // so its alt text can never be read: the two contradict each other.
         if (isDeclaredDecorative && alt) {
-          allIssues.push({
+          // The markup contradicts itself, but an image with role="presentation"
+          // and alt="" satisfies the 1.1.1 exception, so which of the two the
+          // author meant is a question about the image, not a proven failure.
+          allQuestions.push({
             type: 'decorative-img',
             element: selector,
             alt: alt,
+            html: img.outerHTML ? img.outerHTML.substring(0, 200) : null,
+            role: role,
+            question: `Is this image decorative? It carries role="${role}", which removes it from the accessibility tree, and alt="${alt.substring(0, 60)}", which is then never read.`,
             description: `Image with role="${role}" carries alt text that is never exposed`,
-            severity: 'minor',
-            suggestion: 'Use alt="" for a decorative image, or drop the presentation role',
+            measurements: { alt: alt.substring(0, 120), role: role, src: src.substring(0, 160) },
+            context: {
+              nearbyText: (img.parentElement ? img.parentElement.textContent : '')
+                .trim()
+                .substring(0, 160),
+            },
           });
         }
 
@@ -211,6 +313,7 @@ class MediaAccessibilityScanner extends BaseScanner {
         const srcBase = src.split(/[?#]/)[0].split('/').pop() || '';
         if (
           alt &&
+          !isSoleIconOfNamedControl(img) &&
           (FILE_NAME_ALT.test(alt.trim()) || alt.trim().toLowerCase() === srcBase.toLowerCase())
         ) {
           allIssues.push({
@@ -223,37 +326,39 @@ class MediaAccessibilityScanner extends BaseScanner {
           });
         }
 
-        // A data visualisation carries information that a short alt cannot
-        // hold. The word alone is not evidence: an icon of a chart is not a
-        // chart, so the image also has to be painted at figure size.
-        const rect = img.getBoundingClientRect();
-        const isFigureSized = rect.width >= 200 && rect.height >= 150;
-        const isLikelyComplex =
-          isFigureSized &&
-          (namesComplexImage(src) ||
-            namesComplexImage(alt) ||
-            namesComplexImage(className) ||
-            namesComplexImage(id));
-
+        // Whether a short alt serves the same purpose as the image is a
+        // judgement about the content. It is only asked where the page itself
+        // says the image is a data graphic.
+        const evidence = complexityEvidence(img);
         if (
-          isLikelyComplex &&
+          evidence &&
           !img.hasAttribute('longdesc') &&
           !img.hasAttribute('aria-describedby') &&
           !(alt && alt.length > 50)
         ) {
-          allIssues.push({
+          allQuestions.push({
             type: 'complex-img-alt',
             element: selector,
             alt: alt ? alt.substring(0, 50) : '',
-            description: 'Complex image lacks detailed description',
-            severity: 'moderate',
-            suggestion:
-              'Describe the data the chart shows in aria-describedby, longdesc or a longer alt text',
+            html: img.outerHTML ? img.outerHTML.substring(0, 200) : null,
+            role: img.getAttribute('role') || null,
+            question: `Does a reader of the alt text "${(alt || '').substring(0, 60)}" learn what this image conveys, or does it need a long description (WCAG 1.1.1)?`,
+            description: 'Image the page presents as a data graphic has only a short alt text',
+            measurements: { alt: (alt || '').substring(0, 120), altLength: (alt || '').length },
+            context: { figcaption: evidence },
           });
         }
       });
 
       // ========== VIDEO ANALYSIS ==========
+      // The four criteria are separate measurements, and each is only asked
+      // where its own precondition holds:
+      //   1.2.1  prerecorded video-only: a transcript, or an audio track that
+      //          carries the same information;
+      //   1.2.2  captions for prerecorded synchronized media, which needs an
+      //          audio track, and which a transcript does NOT satisfy;
+      //   1.2.3  audio description OR a media alternative for text;
+      //   1.2.5  audio description, and nothing else.
       const videos = document.querySelectorAll('video');
       mediaCounts.totalVideos = videos.length;
 
@@ -262,64 +367,103 @@ class MediaAccessibilityScanner extends BaseScanner {
 
         if (!isEvaluableMedia(video)) return;
         if (isDecorativeBackgroundVideo(video)) return;
-        // 1.2.2, 1.2.3 and 1.2.5 all govern synchronized media, which is
-        // audio synchronized with video. A file that decoded video and no
-        // audio carries none, so none of them applies to it.
-        if (__mediaAudioState(video) === 'silent') return;
+        // Live media is outside every "prerecorded" criterion here.
+        if (isLiveMedia(video)) return;
 
-        const tracks = video.querySelectorAll('track[kind="captions"], track[kind="subtitles"]');
-        const hasCaptionTrack = tracks.length > 0;
-        const hasDescriptionTrack = video.querySelectorAll('track[kind="descriptions"]').length > 0;
+        const kinds = trackKinds(video);
+        const hasCaptionTrack = kinds.has('captions') || kinds.has('subtitles');
+        const hasDescriptionTrack = kinds.has('descriptions');
         const hasTextAlternative = hasTimeBasedTextAlternative(video);
+        const audioState = __mediaAudioState(video);
 
-        // WCAG 1.2.2 (Captions, Prerecorded). Only reported when the video
-        // ships no captions AND no text alternative - a full text alternative
-        // is the recognised mechanism for video-only (silent) content under
-        // 1.2.1, and whether a video carries an audio track at all cannot be
-        // determined from markup.
-        if (!hasCaptionTrack && !hasTextAlternative) {
+        // Nothing was decoded (preload="none", a file that never loaded), so
+        // whether this is synchronized media or a silent clip is not known.
+        // One question, not three findings.
+        if (audioState === 'unknown') {
+          allQuestions.push({
+            type: 'media-audio-track-unknown',
+            element: selector,
+            html: video.outerHTML ? video.outerHTML.substring(0, 200) : null,
+            role: 'video',
+            question: `Does this video carry an audio track? With one it needs captions (WCAG 1.2.2) and audio description (1.2.5); without one it needs a text alternative (1.2.1).`,
+            description: 'Video whose audio track could not be read from the page',
+            measurements: {
+              preload: video.getAttribute('preload') || '',
+              readyState: video.readyState,
+              hasCaptionTrack: hasCaptionTrack,
+              hasDescriptionTrack: hasDescriptionTrack,
+              hasTextAlternative: hasTextAlternative,
+            },
+            context: { src: (video.getAttribute('src') || '').substring(0, 160) },
+          });
+          return;
+        }
+
+        if (audioState === 'silent') {
+          // SC 1.2.1, video-only: an alternative for time-based media, or an
+          // audio track presenting the same information (which it has not).
+          if (!hasTextAlternative) {
+            allIssues.push({
+              type: 'video-only-no-alternative',
+              criterion: '9.1.2.1',
+              element: selector,
+              description:
+                'Prerecorded video with no audio track offers neither a text alternative nor an audio track presenting the same information',
+              severity: 'serious',
+              suggestion:
+                'Provide a transcript of what the video shows, clearly labelled and beside the video, or add an audio track that presents the same information',
+            });
+          }
+          return;
+        }
+
+        // Synchronized media from here on: the video carries audio.
+        if (!hasCaptionTrack) {
           mediaCounts.videosWithoutCaptions++;
           allIssues.push({
             type: 'video-caption',
             criterion: '9.1.2.2',
             element: selector,
-            description: 'Video provides neither a captions/subtitles track nor a text alternative',
+            description:
+              'Synchronized media has no captions for its audio; a transcript does not satisfy SC 1.2.2',
             severity: 'serious',
             suggestion:
-              'Add <track> elements with kind="captions" or kind="subtitles", or provide a full transcript linked via aria-describedby',
+              'Add <track kind="captions"> (or subtitles) with the dialogue and the sounds that matter',
           });
         }
 
-        // WCAG 1.2.3 (A) / 1.2.5 (AA). A missing kind="descriptions" track on
-        // its own is NOT evidence of a failure: audio description is not
-        // required when the audio track already conveys the visual
-        // information, and that is not determinable from markup. Only report
-        // when the video ships no description track, no captions AND no text
-        // alternative - i.e. no accessible alternative of any kind exists.
-        if (!hasDescriptionTrack && !hasCaptionTrack && !hasTextAlternative) {
+        // SC 1.2.3 (A): audio description OR a media alternative for text.
+        if (!hasDescriptionTrack && !hasTextAlternative) {
           allIssues.push({
             type: 'video-description',
             criterion: '9.1.2.3',
             element: selector,
             description:
-              'Video provides neither an audio description nor an alternative for time-based media',
+              'Synchronized media offers neither an audio description nor an alternative for time-based media',
             severity: 'serious',
             suggestion:
               'Provide a full text alternative for the video, or add audio description via <track kind="descriptions">',
           });
+        }
+
+        // SC 1.2.5 (AA): audio description, and only that. A transcript is
+        // the 1.2.3 route and does not satisfy this one.
+        if (!hasDescriptionTrack) {
           allIssues.push({
             type: 'video-audio-description',
             criterion: '9.1.2.5',
             element: selector,
-            description: 'Video lacks an audio description track for its visual content',
+            description: 'Synchronized media has no audio description of its visual content',
             severity: 'moderate',
             suggestion:
-              'Add audio descriptions via <track kind="descriptions"> or supply an audio-described version of the video',
+              'Add audio description via <track kind="descriptions">, or supply an audio-described version of the video',
           });
         }
       });
 
       // ========== AUDIO ANALYSIS ==========
+      // SC 1.2.1, audio-only: prerecorded audio needs an alternative for
+      // time-based media, i.e. a transcript that is named as one.
       const audioElements = document.querySelectorAll('audio');
       mediaCounts.totalAudio = audioElements.length;
 
@@ -327,31 +471,18 @@ class MediaAccessibilityScanner extends BaseScanner {
         const selector = getElementSelector(audio);
 
         if (!isEvaluableMedia(audio)) return;
+        if (isLiveMedia(audio)) return;
 
-        const parent = audio.parentElement;
-        const parentText = parent ? parent.textContent.toLowerCase() : '';
-        const hasTranscriptLink =
-          hasTimeBasedTextAlternative(audio) ||
-          (parent &&
-            (parent.querySelector('a[href*="transcript"]') ||
-              parent.querySelector('a[href*="transkript"]') ||
-              parent.querySelector('[class*="transcript"]') ||
-              parent.querySelector('[id*="transcript"]') ||
-              parent.querySelector('[class*="transkript"]') ||
-              parent.querySelector('[id*="transkript"]') ||
-              parentText.includes('transcript') ||
-              parentText.includes('transkript') ||
-              parentText.includes('abschrift')));
-
-        if (!hasTranscriptLink) {
+        if (!hasTimeBasedTextAlternative(audio)) {
           mediaCounts.audioWithoutTranscripts++;
           allIssues.push({
             type: 'audio-caption',
             criterion: '9.1.2.1',
             element: selector,
-            description: 'Audio content lacks transcript',
+            description: 'Prerecorded audio-only content has no transcript',
             severity: 'serious',
-            suggestion: 'Provide a transcript link or text near the audio element',
+            suggestion:
+              'Link a transcript beside the audio, or put it in a section whose heading names it as the transcript',
           });
         }
       });
@@ -392,7 +523,7 @@ class MediaAccessibilityScanner extends BaseScanner {
         }
       });
 
-      return { allIssues, mediaCounts };
+      return { allIssues, allQuestions, mediaCounts };
     }, mediaAudioUtils);
 
     // Wait for screenshot to complete
@@ -410,6 +541,26 @@ class MediaAccessibilityScanner extends BaseScanner {
       });
     });
 
+    const needsReview = mediaAnalysis.allQuestions.map((q) =>
+      this.formatViolation(
+        q.type,
+        'moderate',
+        q.description,
+        [{ selector: q.element }],
+        'https://www.w3.org/WAI/WCAG22/Understanding/non-text-content.html',
+        'info',
+        {
+          verdict: 'needs-review',
+          dossier: {
+            question: q.question,
+            element: { selector: q.element, html: q.html, role: q.role, name: q.alt || null },
+            measurements: q.measurements,
+            context: q.context,
+          },
+        }
+      )
+    );
+
     // Generate visual evidence
     visualEvidence.push({
       type: 'media-accessibility',
@@ -426,6 +577,7 @@ class MediaAccessibilityScanner extends BaseScanner {
 
     return {
       violations,
+      needsReview,
       visualEvidence,
       ...mediaAnalysis.mediaCounts,
     };

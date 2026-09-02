@@ -72,6 +72,12 @@ const EXCLUSIVE_SCANNERS = {
     module: '../../src/scanners/seizure-prevention',
     criteria: ['2.3.1', '2.3.2', '2.3.3'],
   },
+  // Reloads the page with the screen orientation lock API instrumented and
+  // gives it one click, so it needs its own tab.
+  orientation: {
+    module: '../../src/scanners/orientation',
+    criteria: ['1.3.4'],
+  },
   // 2.4.5 is scoped to a set of web pages, so this scanner asks rather than
   // decides: on a bad file its needs-review question counts as the detection.
   'multiple-ways': {

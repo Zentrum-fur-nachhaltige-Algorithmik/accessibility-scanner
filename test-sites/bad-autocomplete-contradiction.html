@@ -1,0 +1,43 @@
+<!-- WCAG-TEST
+criterion: 1.3.5
+level: AA
+title: Identify Input Purpose
+test_type: bad
+expected_violations: 2
+testable_by: browser
+scanners: input-purpose
+description: A registration form whose telephone field declares autocomplete="email" and whose name fields declare nothing at all. The token names a purpose of a different family than the field collects, and the form does collect the user's own data.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bad: a token that contradicts the field</title>
+<style>
+  body { font-family: sans-serif; margin: 0; color: #1a1a1a; background: #ffffff; }
+  main { padding: 2rem; }
+  label { display: block; margin: 0.5rem 0 0.25rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Register</h1>
+  <form action="/register" method="post">
+    <label for="given">First name</label>
+    <input id="given" name="fname" type="text">
+
+    <label for="family">Last name</label>
+    <input id="family" name="lname" type="text">
+
+    <label for="mail">E-mail</label>
+    <input id="mail" name="email" type="email" autocomplete="email">
+
+    <label for="phone">Telephone</label>
+    <input id="phone" name="phone" type="tel" autocomplete="email">
+
+    <button type="submit">Register</button>
+  </form>
+</main>
+</body>
+</html>

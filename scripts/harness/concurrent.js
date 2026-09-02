@@ -16,10 +16,34 @@ const TEST_SITES = path.join(__dirname, '..', '..', 'test-sites');
 const http = require('http');
 const fs = require('fs');
 const { parseWcagMetadata } = require('./wcag-metadata-parser');
-const { FILE_TO_SCANNERS } = require('./exclusive');
+const { FILE_TO_SCANNERS, CRITERION_TO_SCANNER } = require('./exclusive');
 
 /** Fixtures an exclusive scanner claims by name; the concurrent plan skips them. */
 const CLAIMED_FILES = new Set(Object.keys(FILE_TO_SCANNERS));
+
+/**
+ * A criterion an exclusive scanner owns is that scanner's to detect. A
+ * concurrent scanner may carry a secondary rule under the same criterion
+ * (advanced-aria reports a tree no keyboard can enter under 2.1.1, which is
+ * keyboard-navigation's criterion), and it must not be scored against the
+ * owner's fixtures for it.
+ */
+const EXCLUSIVELY_OWNED = new Set(Object.keys(CRITERION_TO_SCANNER));
+
+/**
+ * Fixture and criterion pairs no rule claims any more, with the reason. The
+ * plan skips them and the run prints them, so a deliberate deletion is a
+ * recorded coverage gap instead of a silent harness failure.
+ */
+const UNCLAIMED = {
+  'bad-css-background-info.html': {
+    criteria: ['1.4.1'],
+    reason:
+      'The status dots that convey online/offline by colour alone were use-of-color ' +
+      'color-coded-indicator, deleted as unfalsifiable (claims-audit fix-list 1). ' +
+      'No rule measures them, and the SVG-in-CSS text on the page is 1.4.5, not 1.4.1.',
+  },
+};
 
 async function loadPuppeteer() {
   try {
@@ -57,7 +81,6 @@ const CONCURRENT_SCANNERS = {
     notOurs: { '1.3.1': ['bad-group-and-format.html'] },
   },
   'media-accessibility': { module: '../../src/scanners/media-accessibility' },
-  orientation: { module: '../../src/scanners/orientation' },
   'input-purpose': { module: '../../src/scanners/input-purpose' },
   // `notOurs`: fixtures that declare a criterion this scanner does not own the
   // defect for. Routing is by criterion, so without it a scanner is scored
@@ -174,9 +197,12 @@ async function main() {
   }
 
   // ---- Build criterion -> scanners map (many-to-many) from real metadata ----
+  // A criterion an exclusive scanner owns is reported by that harness, not
+  // this one, even when a concurrent scanner carries a secondary rule for it.
   const CRITERION_TO_SCANNERS = {};
   for (const [id, criteria] of Object.entries(scannerCriteria)) {
     for (const c of criteria) {
+      if (EXCLUSIVELY_OWNED.has(c)) continue;
       if (!CRITERION_TO_SCANNERS[c]) CRITERION_TO_SCANNERS[c] = [];
       CRITERION_TO_SCANNERS[c].push(id);
     }
@@ -208,10 +234,12 @@ async function main() {
     // alone (see FILE_TO_SCANNERS in exclusive.js).
     if (CLAIMED_FILES.has(file)) continue;
 
+    const unclaimed = new Set(UNCLAIMED[file] ? UNCLAIMED[file].criteria : []);
+
     for (const [sid, criteria] of Object.entries(scannerCriteria)) {
       const notOurs = (CONCURRENT_SCANNERS[sid] || {}).notOurs || {};
       const intersection = intersectCriteria(metadata.criterion, criteria).filter(
-        (c) => !(notOurs[c] || []).includes(file)
+        (c) => !EXCLUSIVELY_OWNED.has(c) && !unclaimed.has(c) && !(notOurs[c] || []).includes(file)
       );
       if (intersection.length === 0) continue;
 
@@ -226,8 +254,12 @@ async function main() {
   }
 
   console.log(
-    `Test plan: ${testPlan.length} tests across ${new Set(testPlan.map((t) => t.scanner)).size} scanners\n`
+    `Test plan: ${testPlan.length} tests across ${new Set(testPlan.map((t) => t.scanner)).size} scanners`
   );
+  for (const [file, gap] of Object.entries(UNCLAIMED)) {
+    console.log(`GAP ${file} ${gap.criteria.join(', ')}: ${gap.reason}`);
+  }
+  console.log('');
 
   // ---- Group files by criterion for byCriterion.files (independent of routing) ----
   const filesByCriterion = {};
@@ -329,12 +361,22 @@ async function main() {
         const relevant = allViolations.filter((v) =>
           matchesCriteria(v, t.criteria, scannerCriteria[scannerId])
         );
+        // A scanner that can find the suspect but not decide it reports a
+        // needs-review question instead of a violation. On a bad file that
+        // question IS the detection: the scanner saw the case. It is never
+        // counted against a good file, where only a violation is a false
+        // positive, because an open question costs no conformance claim.
+        const openQuestions = (result.needsReview || []).filter((v) =>
+          matchesCriteria(v, t.criteria, scannerCriteria[scannerId])
+        );
         matched = relevant.length;
 
-        const ok = t.expectViolations ? relevant.length > 0 : relevant.length === 0;
+        const ok = t.expectViolations
+          ? relevant.length + openQuestions.length > 0
+          : relevant.length === 0;
         const label = t.expectViolations ? 'TRUE-POS' : 'FALSE-POS';
         detail = t.expectViolations
-          ? `${relevant.length} violations`
+          ? `${relevant.length} violations, ${openQuestions.length} needs-review`
           : `${relevant.length} false positives`;
         status = ok ? 'PASS' : 'FAIL';
 
@@ -360,9 +402,12 @@ async function main() {
         // aggregate `matched` count above: a single test can carry several
         // intersected criteria).
         for (const c of t.criteria) {
-          const matchedForC = allViolations.some((v) =>
-            matchesCriteria(v, [c], scannerCriteria[scannerId])
-          );
+          const matchedForC =
+            allViolations.some((v) => matchesCriteria(v, [c], scannerCriteria[scannerId])) ||
+            (t.expectViolations &&
+              (result.needsReview || []).some((v) =>
+                matchesCriteria(v, [c], scannerCriteria[scannerId])
+              ));
           if (!criterionStats[c])
             criterionStats[c] = { truePositive: false, falsePositiveHit: false };
           if (t.expectViolations) {

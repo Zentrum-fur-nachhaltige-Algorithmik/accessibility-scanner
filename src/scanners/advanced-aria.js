@@ -18,7 +18,9 @@ const { injectableCode: renderedCode } = require('../utils/rendered');
 class AdvancedAriaScanner extends BaseScanner {
   constructor() {
     super('advanced-aria', {
-      wcagCriteria: ['4.1.2'],
+      // 2.1.1 for tree-not-keyboard-reachable, 4.1.3 for the live-region
+      // politeness contradiction; both were emitted without being declared.
+      wcagCriteria: ['4.1.2', '2.1.1', '4.1.3'],
       wcagPrinciple: 'robust',
     });
   }
@@ -39,6 +41,10 @@ class AdvancedAriaScanner extends BaseScanner {
 
     const scanOptions = { ...defaultOptions, ...options };
 
+    // Watch the live regions before anything touches the page, so an update
+    // the page makes by itself or under the interactions below is recorded.
+    await this._watchLiveRegions(page);
+
     if (scanOptions.jsInteraction) {
       await BaseScanner.triggerCommonInteractions(page);
     }
@@ -46,7 +52,7 @@ class AdvancedAriaScanner extends BaseScanner {
     const violations = [];
 
     if (scanOptions.checkCompositeWidgets) {
-      violations.push(...(await this.analyzeCompositeWidgets(page)));
+      violations.push(...(await this.analyzeSettledCompositeWidgets(page)));
     }
 
     if (scanOptions.checkCarousels) {
@@ -54,7 +60,7 @@ class AdvancedAriaScanner extends BaseScanner {
     }
 
     if (scanOptions.checkLiveRegions) {
-      violations.push(...(await this.analyzeLiveRegions(page)));
+      violations.push(...(await this.analyzeLiveRegions(page, scanOptions)));
     }
 
     return {
@@ -74,6 +80,24 @@ class AdvancedAriaScanner extends BaseScanner {
       recommendations: this.generateAdvancedAriaRecommendations(violations),
       widgetPatterns: this.generateWidgetPatternGuidance(violations),
     };
+  }
+
+  /**
+   * A tablist whose selected state is applied by the page's own script is
+   * unselected only until hydration runs. The composite analysis is repeated
+   * once a second later, and a no-selected-tab finding is kept only when the
+   * tablist is still unselected then.
+   */
+  async analyzeSettledCompositeWidgets(page) {
+    const first = await this.analyzeCompositeWidgets(page);
+    if (!first.some((v) => v.type === 'no-selected-tab')) return first;
+
+    await new Promise((r) => setTimeout(r, 1000));
+    const second = await this.analyzeCompositeWidgets(page);
+    const stillUnselected = new Set(
+      second.filter((v) => v.type === 'no-selected-tab').map((v) => v.element)
+    );
+    return first.filter((v) => v.type !== 'no-selected-tab' || stillUnselected.has(v.element));
   }
 
   /**
@@ -97,17 +121,15 @@ class AdvancedAriaScanner extends BaseScanner {
           return `${tagName}${id}${className}`;
         }
 
-        // A tree, grid and menubar take their name from the author only
-        // (namefrom: author), so an unnamed one is announced as a bare
-        // "tree"/"grid"/"menu bar". The name is computed with the shared
-        // ACCNAME subset, which also reads title and aria-labelledby, instead
-        // of asking for two attributes.
-        const NAMED_WIDGET_ROLES = ['tree', 'grid', 'treegrid', 'menubar'];
+        // ARIA marks a handful of roles "name required: true". Those are the
+        // ones an unnamed instance of which is a failure of SC 4.1.2. grid
+        // and menubar are NOT among them: ARIA does not require a name on a
+        // data grid or on a site navigation given role="menubar", and
+        // demanding one reports healthy markup.
+        const NAMED_WIDGET_ROLES = ['tree', 'treegrid'];
         const WIDGET_CATEGORY = {
           tree: 'tree-view',
-          grid: 'data-grid',
           treegrid: 'data-grid',
-          menubar: 'menubar',
         };
 
         for (const role of NAMED_WIDGET_ROLES) {
@@ -143,13 +165,24 @@ class AdvancedAriaScanner extends BaseScanner {
             const ti = el.getAttribute('tabindex');
             return ti !== null && parseInt(ti, 10) >= 0;
           };
+          // SC 2.1.1 is about functionality operable from a keyboard. A tree
+          // of plain labels offers no functionality to operate, so only a
+          // tree whose items DO something can fail it.
+          const interactive = items.some(
+            (item) =>
+              item.matches('a[href], button, [onclick], [onkeydown]') ||
+              item.querySelector('a[href], button') ||
+              item.hasAttribute('aria-selected') ||
+              item.hasAttribute('aria-expanded') ||
+              item.getAttribute('data-a11y-listeners')
+          );
           const reachable =
             items.some(tabbable) ||
             tabbable(tree) ||
             tree.hasAttribute('aria-activedescendant') ||
             items.some((item) => item.querySelector('a[href], button'));
 
-          if (!reachable) {
+          if (interactive && !reachable) {
             violations.push({
               type: 'tree-not-keyboard-reachable',
               category: 'tree-view',
@@ -175,6 +208,16 @@ class AdvancedAriaScanner extends BaseScanner {
                 group.closest('[role="treeitem"]') === item
             );
             if (!ownedGroup) continue;
+            // ARIA requires aria-expanded only on a node that CAN be
+            // collapsed. An always-open subtree has no expanded state to
+            // convey, and axe aria-required-attr agrees.
+            const collapsible =
+              ownedGroup.hasAttribute('hidden') ||
+              ownedGroup.getAttribute('aria-hidden') === 'true' ||
+              !__isRendered(ownedGroup) ||
+              item.matches('[onclick], [onkeydown], [data-toggle], [data-bs-toggle]') ||
+              !!item.querySelector('button, [role="button"], [data-toggle], [data-bs-toggle]');
+            if (!collapsible) continue;
 
             violations.push({
               type: 'missing-aria-expanded',
@@ -190,27 +233,12 @@ class AdvancedAriaScanner extends BaseScanner {
           }
         }
 
-        // An open combobox has to say which popup is open. While it is
-        // collapsed there is nothing to point at, and aria-expanded itself is
-        // axe's aria-required-attr.
-        for (const combobox of document.querySelectorAll('[role="combobox"]')) {
-          if (!__isRendered(combobox)) continue;
-          if (combobox.getAttribute('aria-expanded') !== 'true') continue;
-          if (combobox.hasAttribute('aria-controls') || combobox.hasAttribute('aria-owns'))
-            continue;
-
-          violations.push({
-            type: 'missing-aria-controls',
-            category: 'combobox',
-            severity: 'serious',
-            element: getElementSelector(combobox),
-            description: 'Expanded combobox does not identify the popup it controls',
-            details: { id: combobox.id },
-            wcagCriteria: '4.1.2',
-            impact: 'Screen readers cannot move to the open list of options',
-            recommendation: 'Point aria-controls at the id of the open listbox, grid or tree',
-          });
-        }
+        // An expanded combobox that does not name its popup is axe-core's
+        // `aria-required-attr`: axe lists aria-controls as required for
+        // role="combobox" and exempts only aria-expanded="false", so every
+        // element this reported already fails axe in the same run. An ARIA
+        // 1.1 combobox wrapper containing its own listbox needs no
+        // aria-controls at all.
 
         // Selected state of a tablist. An omitted aria-selected means "false",
         // so the failure is the tablist as a whole: no tab selected, or
@@ -445,6 +473,22 @@ class AdvancedAriaScanner extends BaseScanner {
           const cap = fig.querySelector('figcaption');
           if (cap && cap.textContent.trim()) return cap.textContent.trim();
         }
+        // A role="group" slide track inside a role-less wrapper: the heading
+        // that introduces the wrapper is what a reader hears as the name of
+        // the thing, so the carousel is identified.
+        const wrapper = el.parentElement;
+        if (wrapper && !wrapper.getAttribute('role')) {
+          const section = el.closest('section, article, div');
+          if (section) {
+            for (const heading of section.querySelectorAll('h1, h2, h3, h4, h5, h6')) {
+              if (!(el.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_PRECEDING)) {
+                continue;
+              }
+              const text = heading.textContent.trim();
+              if (text) return text;
+            }
+          }
+        }
         // The name of a wrapping region is that region's name, not this
         // component's: an element with its own role needs its own.
         return '';
@@ -481,10 +525,46 @@ class AdvancedAriaScanner extends BaseScanner {
   /**
    * Analyze live region implementation
    */
-  async analyzeLiveRegions(page) {
+  /**
+   * Record every mutation of a live region from now on. A politeness
+   * contradiction costs nobody anything until the region actually says
+   * something, and only a page that was watched from the start can show that.
+   * The scan never interacts with the page from here: the shared page is
+   * measured by the other concurrent scanners at the same time.
+   */
+  async _watchLiveRegions(page) {
+    await page
+      .evaluate(() => {
+        if (window.__a11yLiveUpdates) return;
+        const updated = new Set();
+        window.__a11yLiveUpdates = updated;
+        const observer = new MutationObserver((records) => {
+          for (const record of records) {
+            const target =
+              record.target.nodeType === 1 ? record.target : record.target.parentElement;
+            const region = target
+              ? target.closest('[role="status"], [role="alert"], [role="log"], [aria-live]')
+              : null;
+            if (region) updated.add(region);
+          }
+        });
+        observer.observe(document.body, {
+          subtree: true,
+          childList: true,
+          characterData: true,
+        });
+      })
+      .catch(() => {});
+  }
+
+  async analyzeLiveRegions(page, options = {}) {
+    // Give a page that announces something by itself the time to do it.
+    await new Promise((r) => setTimeout(r, options.observationTime ?? 500));
+
     return await page.evaluate((visScript) => {
       eval(visScript);
       const violations = [];
+      const updated = window.__a11yLiveUpdates || new Set();
 
       function getElementSelector(element) {
         const tagName = element.tagName.toLowerCase();
@@ -506,15 +586,20 @@ class AdvancedAriaScanner extends BaseScanner {
         // politeness setting, and an explicit aria-live="off" overrides it. The
         // author asks for an announcement and suppresses it in the same element.
         if (region.getAttribute('aria-live') !== 'off') return;
+        // A region that never updates announces nothing either way.
+        if (!updated.has(region)) return;
 
         violations.push({
           type: 'contradictory-live-region-politeness',
           category: 'live-region',
           severity: 'moderate',
           element: getElementSelector(region),
-          description: `Element has role="${role}" but aria-live="off", which suppresses the announcement the role asks for`,
-          details: { role, ariaLive: 'off' },
-          wcagCriteria: '4.1.2',
+          description: `Element has role="${role}" but aria-live="off", so the status message it showed was never announced`,
+          details: { role, ariaLive: 'off', observedUpdate: true },
+          // Nothing here is a component name, role or user-settable value:
+          // this is a status message that does not reach the user, SC 4.1.3.
+          criterion: '9.4.1.3',
+          wcagCriteria: '4.1.3',
           impact: 'Updates to this region are never announced despite the live-region role',
           recommendation:
             'Remove aria-live="off", or drop the role if the region should stay silent',
@@ -561,15 +646,6 @@ class AdvancedAriaScanner extends BaseScanner {
         issue: 'Tab selection state is missing or ambiguous',
         solution: 'Maintain aria-selected across the tabs of a tablist',
         implementation: 'Set aria-selected="true" on the active tab and "false" on the others',
-      });
-    }
-
-    if (issueTypes.includes('missing-aria-controls')) {
-      recommendations.push({
-        priority: 'high',
-        issue: 'Widget relationships not properly defined',
-        solution: 'Use aria-controls to link the widget to the content it opens',
-        implementation: 'Ensure aria-controls IDs match existing controlled elements',
       });
     }
 

@@ -20,66 +20,6 @@ class InputPurposeScanner extends BaseScanner {
 
   async scan(page, options = {}) {
     const purposeResults = await page.evaluate(() => {
-      // Full HTML spec autocomplete values
-      const VALID_AUTOCOMPLETE_VALUES = new Set([
-        'name',
-        'honorific-prefix',
-        'given-name',
-        'additional-name',
-        'family-name',
-        'honorific-suffix',
-        'nickname',
-        'email',
-        'username',
-        'new-password',
-        'current-password',
-        'one-time-code',
-        'organization-title',
-        'organization',
-        'street-address',
-        'address-line1',
-        'address-line2',
-        'address-line3',
-        'address-level4',
-        'address-level3',
-        'address-level2',
-        'address-level1',
-        'country',
-        'country-name',
-        'postal-code',
-        'cc-name',
-        'cc-given-name',
-        'cc-additional-name',
-        'cc-family-name',
-        'cc-number',
-        'cc-exp',
-        'cc-exp-month',
-        'cc-exp-year',
-        'cc-csc',
-        'cc-type',
-        'transaction-currency',
-        'transaction-amount',
-        'language',
-        'bday',
-        'bday-day',
-        'bday-month',
-        'bday-year',
-        'sex',
-        'tel',
-        'tel-country-code',
-        'tel-national',
-        'tel-area-code',
-        'tel-local',
-        'tel-extension',
-        'impp',
-        'url',
-        'photo',
-        'webauthn',
-        // Section/billing/shipping prefixes are allowed before any of these
-        'on',
-        'off', // also valid but "off" on purpose fields is a violation
-      ]);
-
       // Tokens that can appear as section prefixes (section-*)
       const SECTION_PREFIX_RE = /^section-\S+$/;
 
@@ -124,7 +64,11 @@ class InputPurposeScanner extends BaseScanner {
           expected: ['one-time-code'],
         },
         { pattern: /\b(org|organization|company|firma)\b/i, expected: ['organization'] },
-        { pattern: /\b(title|job[_-]?title|position)\b/i, expected: ['organization-title'] },
+        // "Titel" and "Position" name a person's job title only in a form
+        // that also asks who the person is; on their own they are the title
+        // of a book, a document or a vacancy. isUserTitleField decides.
+        { pattern: /\b(job[_-]?title)\b/i, expected: ['organization-title'] },
+        { pattern: /\b(title|titel|position)\b/i, expected: ['organization-title'] },
         { pattern: /\b(gender|sex|geschlecht)\b/i, expected: ['sex'] },
         { pattern: /\b(nickname|nick|spitzname)\b/i, expected: ['nickname'] },
         { pattern: /\b(language|sprache)\b/i, expected: ['language'] },
@@ -162,13 +106,6 @@ class InputPurposeScanner extends BaseScanner {
         return filtered;
       }
 
-      function isValidAutocompleteValue(token) {
-        if (VALID_AUTOCOMPLETE_VALUES.has(token)) return true;
-        if (SECTION_PREFIX_RE.test(token)) return true;
-        if (token === 'shipping' || token === 'billing') return true;
-        return false;
-      }
-
       // Purposes that only a form collecting the user's own data asks for.
       // Two of them in one form is the evidence that SC 1.3.5 applies at all:
       // the criterion covers "input fields that collect information about the
@@ -197,7 +134,104 @@ class InputPurposeScanner extends BaseScanner {
         'one-time-code',
       ]);
 
-      function detectPurpose(el) {
+      // The token families of the HTML autocomplete list. Two tokens of the
+      // same family describe the same kind of datum at different precision
+      // (tel and tel-country-code, organization-title and honorific-prefix),
+      // so only a token from a DIFFERENT family contradicts the field.
+      const TOKEN_FAMILY = {};
+      const FAMILIES = {
+        name: [
+          'name',
+          'honorific-prefix',
+          'given-name',
+          'additional-name',
+          'family-name',
+          'honorific-suffix',
+          'nickname',
+          'organization',
+          'organization-title',
+        ],
+        email: ['email'],
+        username: ['username'],
+        password: ['new-password', 'current-password', 'one-time-code'],
+        tel: [
+          'tel',
+          'tel-country-code',
+          'tel-national',
+          'tel-area-code',
+          'tel-local',
+          'tel-local-prefix',
+          'tel-local-suffix',
+          'tel-extension',
+        ],
+        address: [
+          'street-address',
+          'address-line1',
+          'address-line2',
+          'address-line3',
+          'address-level1',
+          'address-level2',
+          'address-level3',
+          'address-level4',
+          'country',
+          'country-name',
+          'postal-code',
+        ],
+        payment: [
+          'cc-name',
+          'cc-given-name',
+          'cc-additional-name',
+          'cc-family-name',
+          'cc-number',
+          'cc-exp',
+          'cc-exp-month',
+          'cc-exp-year',
+          'cc-csc',
+          'cc-type',
+          'transaction-currency',
+          'transaction-amount',
+        ],
+        birthday: ['bday', 'bday-day', 'bday-month', 'bday-year'],
+        web: ['url', 'impp', 'photo'],
+      };
+      for (const [family, tokens] of Object.entries(FAMILIES)) {
+        for (const token of tokens) TOKEN_FAMILY[token] = family;
+      }
+      const familyOf = (token) => TOKEN_FAMILY[token] || null;
+
+      // The family a field's own type demands, whatever its label says.
+      const TYPE_FAMILY = { email: 'email', tel: 'tel', password: 'password', url: 'web' };
+
+      // A "Titel"/"Position" field is a user-title field only in a form that
+      // also asks who the user is, and only when its own label is not about a
+      // book, a document or a vacancy.
+      const NOT_A_PERSON_TITLE =
+        /\b(book|buch|film|movie|song|lied|album|article|artikel|document|dokument|page|seite|post|beitrag|job|stelle|vacanc|search|suche|thesis|paper|product|produkt)\b/i;
+      const PERSON_PURPOSES = new Set([
+        'name',
+        'given-name',
+        'family-name',
+        'email',
+        'street-address',
+        'address-line1',
+      ]);
+
+      function isUserTitleField(el) {
+        const context = [getLabelText(el), el.name || '', el.id || '', el.placeholder || ''].join(
+          ' '
+        );
+        if (NOT_A_PERSON_TITLE.test(context)) return false;
+        if (!el.form) return false;
+        for (const field of el.form.querySelectorAll('input, select, textarea')) {
+          if (field === el) continue;
+          if ((field.type || '').toLowerCase() === 'email') return true;
+          const purposes = detectPurpose(field, true) || [];
+          if (purposes.some((p) => PERSON_PURPOSES.has(p))) return true;
+        }
+        return false;
+      }
+
+      function detectPurpose(el, skipTitleGuard) {
         const name = (el.name || '').toLowerCase();
         const id = (el.id || '').toLowerCase();
         const type = el.type ? `type=${el.type.toLowerCase()}` : '';
@@ -206,9 +240,15 @@ class InputPurposeScanner extends BaseScanner {
         const combined = `${name} ${id} ${type} ${label} ${placeholder}`;
 
         for (const mapping of INPUT_PURPOSE_MAP) {
-          if (mapping.pattern.test(combined)) {
-            return mapping.expected;
+          if (!mapping.pattern.test(combined)) continue;
+          if (
+            !skipTitleGuard &&
+            mapping.expected[0] === 'organization-title' &&
+            !isUserTitleField(el)
+          ) {
+            return null;
           }
+          return mapping.expected;
         }
         return null;
       }
@@ -219,19 +259,20 @@ class InputPurposeScanner extends BaseScanner {
       // field ("enter the URL to check"), a country filter or a language
       // switcher is somebody else's datum or none at all.
       function collectsUserData(el) {
-        const ownType = (el.type || '').toLowerCase();
-        if (ownType === 'email' || ownType === 'tel' || ownType === 'password') return true;
-        // A one-time code is the user's own datum whatever else the form holds.
-        if ((detectPurpose(el) || []).includes('one-time-code')) return true;
-        // The evidence is the form the control belongs to. A control that is
-        // in no form is judged on its own: the fields of a contact form
-        // elsewhere on the page say nothing about a language switcher.
+        // The evidence is the FORM the control belongs to, and it is the form
+        // that has to collect the user's own data: at least two of its fields
+        // must have a purpose from the SC 1.3.5 list. One type="email" field
+        // certifies its own purpose and nothing about the form around it, and
+        // a control that is in no form has no such evidence at all.
         if (!el.form) return false;
         let identityFields = 0;
         for (const field of el.form.querySelectorAll('input, select, textarea')) {
           const fieldType = (field.type || '').toLowerCase();
+          if (['hidden', 'submit', 'button', 'reset', 'image', 'file'].includes(fieldType)) {
+            continue;
+          }
           if (fieldType === 'email' || fieldType === 'tel' || fieldType === 'password') {
-            identityFields += 2;
+            identityFields++;
             continue;
           }
           const purposes = detectPurpose(field) || [];
@@ -268,22 +309,9 @@ class InputPurposeScanner extends BaseScanner {
         if (tokens) {
           fieldsWithAutocomplete++;
 
-          // Check for invalid autocomplete values
+          // Token validity is axe-core's `autocomplete-valid` (tags wcag21aa,
+          // wcag135), which runs in the same audit, so it is not restated here.
           const lastToken = tokens[tokens.length - 1];
-          if (lastToken && !isValidAutocompleteValue(lastToken)) {
-            violations.push({
-              criterion: '9.1.3.5',
-              element: getSelector(el),
-              issue: 'invalid-autocomplete-value',
-              description: `Invalid autocomplete value "${rawAutocomplete}" is not in the HTML spec`,
-              severity: 'error',
-              currentValue: rawAutocomplete,
-              suggestion: detectedPurpose
-                ? `Use autocomplete="${detectedPurpose[0]}"`
-                : 'Use a valid autocomplete value from the HTML spec',
-            });
-            return;
-          }
 
           // Check autocomplete="off" on a field with recognizable purpose
           if (lastToken === 'off' && detectedPurpose && collectsUserData(el)) {
@@ -300,32 +328,36 @@ class InputPurposeScanner extends BaseScanner {
             return;
           }
 
-          // Check if autocomplete value matches the detected purpose
-          if (
-            detectedPurpose &&
-            lastToken !== 'on' &&
-            lastToken !== 'off' &&
-            collectsUserData(el)
-          ) {
-            const matches = detectedPurpose.some((expected) => tokens.includes(expected));
-            if (!matches) {
-              // If the current value is a valid spec purpose, run detectPurpose
-              // in reverse: check if any pattern expects this autocomplete value.
-              // This prevents flagging e.g. autocomplete="photo" on type="url"
-              // when "photo" is a valid, more-specific purpose for the field.
-              const reverseMatch =
-                VALID_AUTOCOMPLETE_VALUES.has(lastToken) &&
-                INPUT_PURPOSE_MAP.some((m) => m.expected.includes(lastToken));
-              if (reverseMatch) return; // valid specific purpose, skip
+          // A token only fails SC 1.3.5 when it CONTRADICTS the field: it
+          // names a purpose of a different family than the field's own type
+          // or than the purpose its label states. A more precise token of the
+          // same family (tel-country-code on a phone field, honorific-prefix
+          // on a "Titel" field) identifies the purpose better, not worse, and
+          // a disagreement with the scanner's guess is not a failure.
+          if (lastToken && lastToken !== 'on' && lastToken !== 'off') {
+            const tokenFamily = familyOf(lastToken);
+            const typeFamily = TYPE_FAMILY[type];
+            const purposeFamily = detectedPurpose ? familyOf(detectedPurpose[0]) : null;
+            const contradicts =
+              tokenFamily &&
+              ((typeFamily && typeFamily !== tokenFamily) ||
+                (!typeFamily && purposeFamily && purposeFamily !== tokenFamily));
+
+            if (contradicts && collectsUserData(el)) {
+              const against = TYPE_FAMILY[type]
+                ? `a field of type="${type}"`
+                : `a field whose label states ${detectedPurpose.join(' or ')}`;
               violations.push({
                 criterion: '9.1.3.5',
                 element: getSelector(el),
                 issue: 'wrong-autocomplete',
-                description: `autocomplete="${rawAutocomplete}" does not match field purpose (expected: ${detectedPurpose.join(' or ')})`,
+                description: `autocomplete="${rawAutocomplete}" names a ${tokenFamily} purpose on ${against}`,
                 severity: 'serious',
                 currentValue: rawAutocomplete,
-                expectedValues: detectedPurpose,
-                suggestion: `Use autocomplete="${detectedPurpose[0]}"`,
+                expectedValues: detectedPurpose || [],
+                suggestion: detectedPurpose
+                  ? `Use autocomplete="${detectedPurpose[0]}"`
+                  : `Use the token for what this field collects`,
               });
             }
           }

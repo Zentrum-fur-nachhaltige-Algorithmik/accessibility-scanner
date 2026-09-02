@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-09-02T15:40:36.681Z",
+  "generatedAt": "2026-09-02T15:54:57.791Z",
   "harness": "exclusive",
   "totals": {
-    "passed": 117,
-    "failed": 1
+    "passed": 116,
+    "failed": 0
   },
   "results": [
     {
@@ -23,7 +23,7 @@
       "criteria": [
         "4.1.3"
       ],
-      "matched": 5,
+      "matched": 6,
       "status": "PASS"
     },
     {
@@ -38,36 +38,6 @@
     },
     {
       "file": "good-aria-state-updates.html",
-      "scanner": "status-messages",
-      "expectViolations": false,
-      "criteria": [
-        "4.1.3"
-      ],
-      "matched": 0,
-      "status": "PASS"
-    },
-    {
-      "file": "good-bootstrap-error-decoration.html",
-      "scanner": "status-messages",
-      "expectViolations": false,
-      "criteria": [
-        "4.1.3"
-      ],
-      "matched": 0,
-      "status": "PASS"
-    },
-    {
-      "file": "good-progress-with-value.html",
-      "scanner": "status-messages",
-      "expectViolations": false,
-      "criteria": [
-        "4.1.3"
-      ],
-      "matched": 0,
-      "status": "PASS"
-    },
-    {
-      "file": "good-search-results-and-tabs.html",
       "scanner": "status-messages",
       "expectViolations": false,
       "criteria": [
@@ -283,6 +253,16 @@
       "status": "PASS"
     },
     {
+      "file": "bad-scrollable-content.html",
+      "scanner": "keyboard-navigation",
+      "expectViolations": true,
+      "criteria": [
+        "2.1.1"
+      ],
+      "matched": 5,
+      "status": "PASS"
+    },
+    {
       "file": "good-accessibility.html",
       "scanner": "keyboard-navigation",
       "expectViolations": false,
@@ -343,16 +323,6 @@
       "status": "PASS"
     },
     {
-      "file": "good-dialog-close-controls.html",
-      "scanner": "keyboard-navigation",
-      "expectViolations": false,
-      "criteria": [
-        "2.1.2"
-      ],
-      "matched": 0,
-      "status": "PASS"
-    },
-    {
       "file": "good-keyboard-native-override.html",
       "scanner": "keyboard-navigation",
       "expectViolations": false,
@@ -368,16 +338,6 @@
       "expectViolations": false,
       "criteria": [
         "2.1.2"
-      ],
-      "matched": 0,
-      "status": "PASS"
-    },
-    {
-      "file": "good-keydown-analytics-attribute.html",
-      "scanner": "keyboard-navigation",
-      "expectViolations": false,
-      "criteria": [
-        "2.1.4"
       ],
       "matched": 0,
       "status": "PASS"
@@ -403,16 +363,6 @@
       "status": "PASS"
     },
     {
-      "file": "good-widget-exit-by-escape.html",
-      "scanner": "keyboard-navigation",
-      "expectViolations": false,
-      "criteria": [
-        "2.1.2"
-      ],
-      "matched": 0,
-      "status": "PASS"
-    },
-    {
       "file": "bad-concurrent-input.html",
       "scanner": "concurrent-input",
       "expectViolations": true,
@@ -433,7 +383,7 @@
       "status": "PASS"
     },
     {
-      "file": "good-map-canvas-gestures.html",
+      "file": "good-touch-and-pointer-alternatives.html",
       "scanner": "concurrent-input",
       "expectViolations": false,
       "criteria": [
@@ -443,11 +393,161 @@
       "status": "PASS"
     },
     {
-      "file": "good-touch-and-pointer-alternatives.html",
-      "scanner": "concurrent-input",
+      "file": "bad-cross-origin-css.html",
+      "scanner": "orientation",
+      "expectViolations": true,
+      "criteria": [
+        "1.3.4"
+      ],
+      "matched": 1,
+      "status": "PASS"
+    },
+    {
+      "file": "bad-orientation.html",
+      "scanner": "orientation",
+      "expectViolations": true,
+      "criteria": [
+        "1.3.4"
+      ],
+      "matched": 2,
+      "status": "PASS"
+    },
+    {
+      "file": "good-orientation-duplicate-hidden.html",
+      "scanner": "orientation",
       "expectViolations": false,
       "criteria": [
-        "2.5.6"
+        "1.3.4"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-orientation-lock-mentioned-only.html",
+      "scanner": "orientation",
+      "expectViolations": false,
+      "criteria": [
+        "1.3.4"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-orientation-responsive.html",
+      "scanner": "orientation",
+      "expectViolations": false,
+      "criteria": [
+        "1.3.4"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-orientation.html",
+      "scanner": "orientation",
+      "expectViolations": false,
+      "criteria": [
+        "1.3.4"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "bad-cross-origin-css.html",
+      "scanner": "nontext-contrast",
+      "expectViolations": true,
+      "criteria": [
+        "1.4.11"
+      ],
+      "matched": 1,
+      "status": "PASS"
+    },
+    {
+      "file": "bad-nontext-contrast.html",
+      "scanner": "nontext-contrast",
+      "expectViolations": true,
+      "criteria": [
+        "1.4.11"
+      ],
+      "matched": 23,
+      "status": "PASS"
+    },
+    {
+      "file": "bad-progress-indicator-contrast.html",
+      "scanner": "nontext-contrast",
+      "expectViolations": true,
+      "criteria": [
+        "1.4.11"
+      ],
+      "matched": 1,
+      "status": "PASS"
+    },
+    {
+      "file": "good-aria-current-nav.html",
+      "scanner": "nontext-contrast",
+      "expectViolations": false,
+      "criteria": [
+        "1.4.11"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-graphic-parts-contrast.html",
+      "scanner": "nontext-contrast",
+      "expectViolations": false,
+      "criteria": [
+        "1.4.11"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-nontext-boundary-fill-and-icon.html",
+      "scanner": "nontext-contrast",
+      "expectViolations": false,
+      "criteria": [
+        "1.4.11"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-nontext-contrast.html",
+      "scanner": "nontext-contrast",
+      "expectViolations": false,
+      "criteria": [
+        "1.4.11"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-progress-indicator-contrast.html",
+      "scanner": "nontext-contrast",
+      "expectViolations": false,
+      "criteria": [
+        "1.4.11"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-state-styles-unused.html",
+      "scanner": "nontext-contrast",
+      "expectViolations": false,
+      "criteria": [
+        "1.4.11"
+      ],
+      "matched": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "good-ua-default-controls.html",
+      "scanner": "nontext-contrast",
+      "expectViolations": false,
+      "criteria": [
+        "1.4.11"
       ],
       "matched": 0,
       "status": "PASS"
@@ -471,7 +571,7 @@
         "2.5.2",
         "2.5.4"
       ],
-      "matched": 4,
+      "matched": 5,
       "status": "PASS"
     },
     {
@@ -501,7 +601,7 @@
       "criteria": [
         "2.5.2"
       ],
-      "matched": 4,
+      "matched": 3,
       "status": "PASS"
     },
     {
@@ -530,16 +630,6 @@
       "expectViolations": false,
       "criteria": [
         "2.5.7"
-      ],
-      "matched": 0,
-      "status": "PASS"
-    },
-    {
-      "file": "good-icon-link-with-equivalent.html",
-      "scanner": "input-modalities",
-      "expectViolations": false,
-      "criteria": [
-        "2.5.8"
       ],
       "matched": 0,
       "status": "PASS"
@@ -575,16 +665,6 @@
       "status": "PASS"
     },
     {
-      "file": "good-parallax-tilt.html",
-      "scanner": "input-modalities",
-      "expectViolations": false,
-      "criteria": [
-        "2.5.4"
-      ],
-      "matched": 0,
-      "status": "PASS"
-    },
-    {
       "file": "good-pointer-cancellation.html",
       "scanner": "input-modalities",
       "expectViolations": false,
@@ -604,26 +684,6 @@
         "2.5.4",
         "2.5.7",
         "2.5.8"
-      ],
-      "matched": 0,
-      "status": "PASS"
-    },
-    {
-      "file": "good-press-preview-and-ripple.html",
-      "scanner": "input-modalities",
-      "expectViolations": false,
-      "criteria": [
-        "2.5.2"
-      ],
-      "matched": 0,
-      "status": "PASS"
-    },
-    {
-      "file": "good-swipe-carousel-with-buttons.html",
-      "scanner": "input-modalities",
-      "expectViolations": false,
-      "criteria": [
-        "2.5.1"
       ],
       "matched": 0,
       "status": "PASS"
@@ -700,16 +760,6 @@
       "status": "PASS"
     },
     {
-      "file": "good-dialog-slow-transition.html",
-      "scanner": "focus-management",
-      "expectViolations": false,
-      "criteria": [
-        "2.4.3"
-      ],
-      "matched": 0,
-      "status": "PASS"
-    },
-    {
       "file": "good-dismiss-and-load-more.html",
       "scanner": "focus-management",
       "expectViolations": false,
@@ -752,16 +802,6 @@
     },
     {
       "file": "good-rtl-tab-order.html",
-      "scanner": "focus-management",
-      "expectViolations": false,
-      "criteria": [
-        "2.4.3"
-      ],
-      "matched": 0,
-      "status": "PASS"
-    },
-    {
-      "file": "good-search-first-tabindex.html",
       "scanner": "focus-management",
       "expectViolations": false,
       "criteria": [
@@ -817,7 +857,7 @@
       "criteria": [
         "1.4.13"
       ],
-      "matched": 1,
+      "matched": 2,
       "status": "PASS"
     },
     {
@@ -954,56 +994,6 @@
       "status": "PASS"
     },
     {
-      "file": "bad-nontext-contrast.html",
-      "scanner": "nontext-contrast",
-      "expectViolations": true,
-      "criteria": [
-        "1.4.11"
-      ],
-      "matched": 23,
-      "status": "PASS"
-    },
-    {
-      "file": "good-graphic-parts-contrast.html",
-      "scanner": "nontext-contrast",
-      "expectViolations": false,
-      "criteria": [
-        "1.4.11"
-      ],
-      "matched": 0,
-      "status": "PASS"
-    },
-    {
-      "file": "good-nontext-boundary-fill-and-icon.html",
-      "scanner": "nontext-contrast",
-      "expectViolations": false,
-      "criteria": [
-        "1.4.11"
-      ],
-      "matched": 0,
-      "status": "PASS"
-    },
-    {
-      "file": "good-nontext-contrast.html",
-      "scanner": "nontext-contrast",
-      "expectViolations": false,
-      "criteria": [
-        "1.4.11"
-      ],
-      "matched": 0,
-      "status": "PASS"
-    },
-    {
-      "file": "good-state-styles-unused.html",
-      "scanner": "nontext-contrast",
-      "expectViolations": false,
-      "criteria": [
-        "1.4.11"
-      ],
-      "matched": 0,
-      "status": "PASS"
-    },
-    {
       "file": "bad-reflow.html",
       "scanner": "responsive-design",
       "expectViolations": true,
@@ -1103,18 +1093,7 @@
         "2.4.2",
         "2.4.3"
       ],
-      "matched": 1,
-      "status": "PASS"
-    },
-    {
-      "file": "good-spa-filter-and-tabbar.html",
-      "scanner": "dynamic-spa",
-      "expectViolations": false,
-      "criteria": [
-        "2.4.2",
-        "2.4.3"
-      ],
-      "matched": 0,
+      "matched": 2,
       "status": "PASS"
     },
     {

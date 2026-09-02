@@ -1,0 +1,39 @@
+<!-- WCAG-TEST
+criterion: 1.4.11
+level: AA
+title: Non-text Contrast
+test_type: good
+expected_violations: 0
+testable_by: browser
+scanners: nontext-contrast
+description: A navigation whose current item is tinted by an [aria-current] rule that does not reach 3:1 against the resting colour. aria-current is a property saying which item of a set is current, not a user-settable state, so insufficient-interactive-state-contrast must stay silent.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Good: the current navigation item</title>
+<style>
+  body { font-family: sans-serif; margin: 0; color: #1a1a1a; background: #ffffff; }
+  nav { padding: 1rem 2rem; }
+  nav a { color: #1a1a1a; margin-right: 1rem; text-decoration: underline; }
+  /* A tint on the current item, beside the underline every item carries. */
+  nav a[aria-current='page'] { color: #2b2b2b; }
+  main { padding: 0 2rem 2rem; }
+</style>
+</head>
+<body>
+<nav aria-label="Main">
+  <a href="/">Home</a>
+  <a href="/products" aria-current="page">Products</a>
+  <a href="/service">Service</a>
+  <a href="/contact">Contact</a>
+</nav>
+<main>
+  <h1>Products</h1>
+  <p>The heading of the page says which page it is, and the current item in the
+  navigation is marked with aria-current so assistive technology says so too.</p>
+</main>
+</body>
+</html>

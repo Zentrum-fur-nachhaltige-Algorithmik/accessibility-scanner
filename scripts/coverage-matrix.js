@@ -45,12 +45,6 @@ const HOW = {
  * `adjudicated`, not `measured`. The mechanism stays what it is; only the kind
  * of answer differs.
  */
-const ADJUDICATED_BY_DETERMINISTIC = new Set([
-  // 2.4.5 Multiple Ways is scoped to a set of web pages; multiple-ways counts
-  // the mechanisms of the one page it sees and hands the count to a reviewer.
-  '2.4.5',
-]);
-
 /** LLM scanners that judge the page as a whole rather than named elements. */
 const PAGE_JUDGEMENT_SCANNERS = new Set(['llm-reading-level', 'llm-semantic-text']);
 
@@ -514,12 +508,28 @@ function collectHarnessOutcomes() {
  *
  * @returns {string} one of HOW
  */
+/**
+ * Deterministic scanners that, for a given criterion, only ever ASK: they emit
+ * a needs-review dossier and never a violation, so the criterion is decided by
+ * a reviewer answering the question and not by the scan itself.
+ *
+ * images-of-text finds the text an SVG paints but cannot read whether that
+ * presentation is essential, which is the exception SC 1.4.5 carries, so every
+ * finding of it is a question (claims-audit fix-list 28).
+ */
+const ASKS_ONLY = {
+  '1.4.5': ['images-of-text'],
+  // 2.4.5 Multiple Ways is scoped to a set of web pages; multiple-ways counts
+  // the mechanisms of the one page it sees and hands the count to a reviewer.
+  '2.4.5': ['multiple-ways'],
+};
+
 function howOf({ sc, isManual, axeRules, det, llm }) {
   if (isManual) return HOW.MANUAL;
-  if (axeRules.length === 0 && det.length > 0 && ADJUDICATED_BY_DETERMINISTIC.has(sc)) {
-    return HOW.ADJUDICATED;
-  }
-  if (axeRules.length > 0 || det.length > 0) return HOW.MEASURED;
+  const asksOnly = ASKS_ONLY[sc] || [];
+  const decides = det.filter((s) => !asksOnly.includes(s.id));
+  if (axeRules.length > 0 || decides.length > 0) return HOW.MEASURED;
+  if (det.length > 0) return HOW.ADJUDICATED;
   if (llm.some((s) => !PAGE_JUDGEMENT_SCANNERS.has(s.id))) return HOW.ADJUDICATED;
   if (llm.length > 0) return HOW.PAGE_JUDGEMENT;
   return HOW.MANUAL;

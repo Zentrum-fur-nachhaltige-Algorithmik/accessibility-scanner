@@ -1,0 +1,80 @@
+<!-- WCAG-TEST
+criterion: 1.2.1, 1.2.2, 1.2.3, 1.2.5
+level: AA
+title: Audio-only and Video-only, Captions, Audio Description
+test_type: good
+expected_violations: 0
+testable_by: browser
+scanners: media-accessibility
+description: Synchronized media whose captions are added through addTextTrack and which ships an audio description, a silent video with a transcript section, a video with preload="none" whose audio track cannot be read, and audio with a linked transcript. Nothing here fails 1.2.1, 1.2.2, 1.2.3 or 1.2.5.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Good: the 1.2.x criteria satisfied each in its own way</title>
+<style>
+  body { font-family: sans-serif; margin: 0; color: #1a1a1a; background: #ffffff; }
+  main { padding: 2rem; }
+  section { margin-bottom: 2rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Media library</h1>
+
+  <section id="course">
+    <h2>The course</h2>
+    <video id="js-player" controls width="480">
+      <source src="course.mp4" type="video/mp4">
+      <track kind="descriptions" src="course-descriptions.vtt" srclang="en" label="Audio description">
+    </video>
+    <p>The player loads its captions from the caption service.</p>
+  </section>
+
+  <section id="timelapse">
+    <h2>Timelapse of the build</h2>
+    <video id="silent-with-transcript" controls width="480">
+      <source src="timelapse.mp4" type="video/mp4">
+    </video>
+    <div>
+      <h3>Transcript</h3>
+      <p>The camera watches the hall over eight hours: the frame goes up in the
+      morning, the roof panels arrive at noon, and the glazing is finished
+      before the light goes.</p>
+    </div>
+  </section>
+
+  <section id="teaser">
+    <h2>Teaser</h2>
+    <video id="unloaded" controls width="480" preload="none" poster="teaser.jpg">
+      <source src="teaser.mp4" type="video/mp4">
+    </video>
+    <p>The teaser loads when it is played.</p>
+  </section>
+
+  <section id="episode">
+    <h2>Episode 12</h2>
+    <audio id="podcast-audio" controls>
+      <source src="episode-12.mp3" type="audio/mpeg">
+    </audio>
+    <p><a href="/transcripts/episode-12">Read the transcript of episode 12</a></p>
+  </section>
+</main>
+<script>
+  // The repository ships no media binaries, so the decoded-track state a
+  // browser would report is declared here; the teaser is left alone, which is
+  // the preload="none" case where the state stays unknown.
+  function fakeAudioTracks(el, count) {
+    Object.defineProperty(el, 'audioTracks', { value: { length: count } });
+  }
+  var player = document.getElementById('js-player');
+  fakeAudioTracks(player, 1);
+  fakeAudioTracks(document.getElementById('silent-with-transcript'), 0);
+
+  // Captions a JS player adds at runtime are captions.
+  player.addTextTrack('captions', 'English', 'en');
+</script>
+</body>
+</html>

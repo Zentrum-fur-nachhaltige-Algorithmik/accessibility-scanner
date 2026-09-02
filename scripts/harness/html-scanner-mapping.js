@@ -1358,7 +1358,7 @@ const HTML_SCANNER_MAPPING = {
     testType: 'good',
     wcagCriteria: ['1.4.1'],
     description:
-      'Status dots named by a visually hidden span or a title, identical decorative bullets and a colour picker of named buttons: color-coded-indicator must stay silent',
+      'Status dots named by a visually hidden span or a title, identical decorative bullets and a colour picker of named buttons: use-of-color must stay silent',
   },
 
   'good-inline-text-links.html': {

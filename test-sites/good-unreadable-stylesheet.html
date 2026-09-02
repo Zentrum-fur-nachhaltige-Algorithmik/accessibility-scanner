@@ -18,7 +18,11 @@ description: The stylesheet declaring the hover and focus underline is served fr
   (function () {
     var port = Number(location.port || 80) + 1;
     var href = location.protocol + '//' + location.hostname + ':' + port + '/no-cors-cues.css';
-    document.write('<link rel="stylesheet" href="' + href + '">');
+    // A link whose origin does not answer stays in document.styleSheets as an
+    // opaque sheet, so only its own error event says it did not load.
+    document.write(
+      '<link rel="stylesheet" href="' + href + '" onerror="window.__crossOriginCssFailed = true">'
+    );
   })();
 </script>
 <style>
@@ -42,10 +46,7 @@ description: The stylesheet declaring the hover and focus underline is served fr
 </template>
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    var loaded = Array.prototype.some.call(document.styleSheets, function (sheet) {
-      return sheet.href && sheet.href.indexOf('no-cors-cues.css') !== -1;
-    });
-    if (loaded) return;
+    if (!window.__crossOriginCssFailed) return;
     var style = document.createElement('style');
     style.textContent = document.getElementById('fallback-css').innerHTML;
     document.head.appendChild(style);

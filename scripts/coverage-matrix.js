@@ -478,9 +478,25 @@ function collectHarnessOutcomes() {
  *
  * @returns {string} one of HOW
  */
-function howOf({ isManual, axeRules, det, llm }) {
+/**
+ * Deterministic scanners that, for a given criterion, only ever ASK: they emit
+ * a needs-review dossier and never a violation, so the criterion is decided by
+ * a reviewer answering the question and not by the scan itself.
+ *
+ * images-of-text finds the text an SVG paints but cannot read whether that
+ * presentation is essential, which is the exception SC 1.4.5 carries, so every
+ * finding of it is a question (claims-audit fix-list 28).
+ */
+const ASKS_ONLY = {
+  '1.4.5': ['images-of-text'],
+};
+
+function howOf({ sc, isManual, axeRules, det, llm }) {
   if (isManual) return HOW.MANUAL;
-  if (axeRules.length > 0 || det.length > 0) return HOW.MEASURED;
+  const asksOnly = ASKS_ONLY[sc] || [];
+  const decides = det.filter((s) => !asksOnly.includes(s.id));
+  if (axeRules.length > 0 || decides.length > 0) return HOW.MEASURED;
+  if (det.length > 0) return HOW.ADJUDICATED;
   if (llm.some((s) => !PAGE_JUDGEMENT_SCANNERS.has(s.id))) return HOW.ADJUDICATED;
   if (llm.length > 0) return HOW.PAGE_JUDGEMENT;
   return HOW.MANUAL;
@@ -561,7 +577,7 @@ function buildRows() {
       level,
       title,
       mechanism,
-      how: howOf({ isManual, axeRules, det, llm }),
+      how: howOf({ sc, isManual, axeRules, det, llm }),
       supporting,
       justification,
       isManual,

@@ -3,10 +3,10 @@ criterion: 1.4.11
 level: AA
 title: Non-text Contrast
 test_type: bad
-expected_violations: 2
+expected_violations: 1
 testable_by: browser
 scanners: nontext-contrast
-description: Progress bars whose filled indicator is barely distinguishable from the track it is painted in, so the value the bar shows cannot be perceived.
+description: A custom progress bar whose filled indicator is barely distinguishable from the track it is painted in, so the value the bar shows cannot be perceived. The native <progress> beside it is painted by the user agent, which exposes no colour to measure.
 -->
 <!DOCTYPE html>
 <html lang="en">

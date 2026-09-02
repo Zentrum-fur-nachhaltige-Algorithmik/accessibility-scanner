@@ -539,7 +539,10 @@ class NonTextContrastScanner extends BaseScanner {
           if (!parts) continue;
           const valueRgb = __parseRgb(parts.value);
           const trackRgb = __parseRgb(parts.track);
-          if (!valueRgb || !trackRgb) continue;
+          // A native <progress> is painted by the user agent: Chromium
+          // exposes no colour for ::-webkit-progress-value or -bar, so there
+          // is nothing to measure and nothing the author modified.
+          if (!valueRgb || !trackRgb || valueRgb.a === 0 || trackRgb.a === 0) continue;
           // The track can be translucent, so both layers are composited onto
           // the backdrop before the ratio is taken.
           const flattenedTrack = __blendOver(trackRgb, backdrop);

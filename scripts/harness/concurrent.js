@@ -167,9 +167,12 @@ async function main() {
   }
 
   // ---- Build criterion -> scanners map (many-to-many) from real metadata ----
+  // A criterion an exclusive scanner owns is reported by that harness, not
+  // this one, even when a concurrent scanner carries a secondary rule for it.
   const CRITERION_TO_SCANNERS = {};
   for (const [id, criteria] of Object.entries(scannerCriteria)) {
     for (const c of criteria) {
+      if (EXCLUSIVELY_OWNED.has(c)) continue;
       if (!CRITERION_TO_SCANNERS[c]) CRITERION_TO_SCANNERS[c] = [];
       CRITERION_TO_SCANNERS[c].push(id);
     }

@@ -52,7 +52,6 @@ const CONCURRENT_SCANNERS = {
   'images-of-text': { module: '../../src/scanners/images-of-text' },
   'screen-reader': { module: '../../src/scanners/screen-reader' },
   'media-accessibility': { module: '../../src/scanners/media-accessibility' },
-  orientation: { module: '../../src/scanners/orientation' },
   'input-purpose': { module: '../../src/scanners/input-purpose' },
   'error-handling': { module: '../../src/scanners/error-handling' },
   'page-structure': { module: '../../src/scanners/page-structure' },

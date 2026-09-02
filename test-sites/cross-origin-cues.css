@@ -1,0 +1,28 @@
+/* Served from the second fixture origin, so document.styleSheets exposes it
+   but cssRules throws: only a fetch of this source can read the rules. */
+:root {
+  --cross-origin-css: loaded;
+}
+
+article a {
+  color: #0b5ed7;
+}
+
+article a:hover,
+article a:focus {
+  text-decoration: underline;
+}
+
+@media (orientation: portrait) {
+  main {
+    display: none;
+  }
+}
+
+.toggle[aria-expanded='true'] {
+  background-color: #767676;
+}
+
+.wide-panel {
+  width: 1200px;
+}

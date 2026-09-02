@@ -1,0 +1,6 @@
+/* Served from the second fixture origin WITHOUT Access-Control-Allow-Origin,
+   so neither cssRules nor a fetch of the source can read it. */
+article a:hover,
+article a:focus {
+  text-decoration: underline;
+}

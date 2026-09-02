@@ -11,6 +11,7 @@ const BaseScanner = require('../core/base-scanner');
 const { TIMEOUTS, DEVICES } = require('../core/constants');
 const { injectableCode: renderedCode } = require('../utils/rendered');
 const { injectableCode: textClippingCode } = require('../utils/text-clipping');
+const { injectableCode: styleSheetCode } = require('../utils/stylesheets');
 const log = require('../utils/logger').createLogger('responsive-design');
 
 /**
@@ -477,10 +478,11 @@ class ResponsiveDesignScanner extends BaseScanner {
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     const reflowAnalysis = await page.evaluate(
-      (renderedSrc, clipSrc, overflowSrc) => {
+      async (renderedSrc, clipSrc, overflowSrc, styleSheetSrc) => {
         eval(renderedSrc);
         eval(clipSrc);
         eval(overflowSrc);
+        eval(styleSheetSrc);
 
         const viewportWidth = window.innerWidth || 320;
 
@@ -498,15 +500,18 @@ class ResponsiveDesignScanner extends BaseScanner {
           return false;
         }
 
-        // Authored width and min-width, from the cascade.
+        // Authored width and min-width, from the cascade. Cross-origin sheets
+        // are fetched and parsed by __readStyleSheets, so a page whose CSS
+        // sits on a CDN is measured instead of silently passing.
         const styleRules = [];
+        const { sheets: readableSheets } = await __readStyleSheets();
         try {
-          for (const sheet of document.styleSheets) {
+          for (const sheet of readableSheets) {
             let rules;
             try {
               rules = sheet.cssRules;
             } catch (e) {
-              continue; // cross-origin
+              continue;
             }
             if (!rules) continue;
             const walk = (list) => {
@@ -604,7 +609,8 @@ class ResponsiveDesignScanner extends BaseScanner {
       },
       renderedCode,
       textClippingCode,
-      OVERFLOW_CODE
+      OVERFLOW_CODE,
+      styleSheetCode
     );
 
     if (options.scanDir) {

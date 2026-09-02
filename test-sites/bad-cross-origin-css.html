@@ -1,0 +1,65 @@
+<!-- WCAG-TEST
+criterion: 1.3.4, 1.4.11
+level: AA
+title: Cross-origin stylesheet
+test_type: bad
+expected_violations: 2
+testable_by: browser
+scanners: orientation, nontext-contrast
+description: The page loads its only stylesheet from a second origin, so document.styleSheets exposes it and cssRules throws. The orientation lock and the state colour declared in that sheet must still be measured.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bad: rules declared in a cross-origin stylesheet</title>
+<script>
+  // The second fixture origin is the primary server's port plus one. Written
+  // during parsing so the stylesheet is fetched like any other <link>.
+  (function () {
+    var port = Number(location.port || 80) + 1;
+    var href = location.protocol + '//' + location.hostname + ':' + port + '/cross-origin-cues.css';
+    document.write('<link rel="stylesheet" href="' + href + '">');
+  })();
+</script>
+<style>
+  body { font-family: sans-serif; margin: 0; color: #1a1a1a; background: #ffffff; }
+  main { padding: 2rem; }
+  .toggle { background-color: #808080; color: #ffffff; border: 2px solid #1a1a1a; padding: 0.5rem 1rem; }
+  .wide-panel { background: #eeeeee; padding: 1rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Quarterly report</h1>
+  <article>
+    <p>The figures of the last quarter are collected in the <a href="/report">full report</a>,
+    which lists every region and every product line with its own commentary.</p>
+  </article>
+  <button class="toggle" type="button" aria-expanded="false">Show details</button>
+  <div class="wide-panel">A panel the stylesheet on the other origin pins to a fixed width.</div>
+</main>
+<template id="fallback-css">
+  :root { --cross-origin-css: loaded; }
+  article a { color: #0b5ed7; }
+  article a:hover, article a:focus { text-decoration: underline; }
+  @media (orientation: portrait) { main { display: none; } }
+  .toggle[aria-expanded="true"] { background-color: #767676; }
+  .wide-panel { width: 1200px; }
+</template>
+<script>
+  // Without the second origin (the fixture harnesses serve one port only) the
+  // same declarations are applied from here, so the page stays the same test.
+  document.addEventListener('DOMContentLoaded', function () {
+    var loaded = Array.prototype.some.call(document.styleSheets, function (sheet) {
+      return sheet.href && sheet.href.indexOf('cross-origin-cues.css') !== -1;
+    });
+    if (loaded) return;
+    var style = document.createElement('style');
+    style.textContent = document.getElementById('fallback-css').innerHTML;
+    document.head.appendChild(style);
+  });
+</script>
+</body>
+</html>

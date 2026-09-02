@@ -40,6 +40,7 @@ const pageGlobals = Object.fromEntries(
     '__a11ySelector',
     '__a11yIndicator',
     '__isSrOnly',
+    '__readStyleSheets',
   ].map((g) => [g, 'readonly'])
 );
 

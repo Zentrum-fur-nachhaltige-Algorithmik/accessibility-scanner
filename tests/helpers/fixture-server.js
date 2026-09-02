@@ -14,8 +14,16 @@ const MIME_TYPES = {
 
 let server = null;
 let baseUrl = null;
+// Second origin, on the primary port + 1, serving the same directory. A
+// fixture that loads its stylesheet from here reproduces the CDN case: the
+// sheet renders, `cssRules` throws, and only a fetch of its source can read
+// it. Files whose name contains "no-cors" are served without the
+// Access-Control-Allow-Origin header, so that fetch fails too and a scanner
+// has to say the sheet was unreadable.
+let crossOriginServer = null;
+let crossOriginBaseUrl = null;
 
-function createFixtureServer() {
+function createFixtureServer({ crossOrigin = false } = {}) {
   const testSitesDir = path.resolve(__dirname, '../../test-sites');
 
   const srv = http.createServer((req, res) => {
@@ -38,7 +46,11 @@ function createFixtureServer() {
 
       const ext = path.extname(filePath);
       const contentType = MIME_TYPES[ext] || 'application/octet-stream';
-      res.writeHead(200, { 'Content-Type': contentType });
+      const headers = { 'Content-Type': contentType };
+      if (crossOrigin && !path.basename(filePath).includes('no-cors')) {
+        headers['Access-Control-Allow-Origin'] = '*';
+      }
+      res.writeHead(200, headers);
       res.end(data);
     });
   });
@@ -61,15 +73,45 @@ async function startFixtureServer() {
   });
 }
 
-async function stopFixtureServer() {
-  if (!server) return;
-  return new Promise((resolve) => {
-    server.close(() => {
+/**
+ * Start (once) the second origin on the primary server's port + 1 and return
+ * its base URL. The primary server has to be running already.
+ */
+async function startCrossOriginServer() {
+  if (crossOriginBaseUrl) return crossOriginBaseUrl;
+  if (!baseUrl) throw new Error('Fixture server not started');
+
+  // The primary port is chosen by the OS, so port + 1 can already be taken.
+  // Then the primary moves to another random port and the pair is tried again.
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const port = Number(new URL(baseUrl).port) + 1;
+    const srv = createFixtureServer({ crossOrigin: true });
+    try {
+      await new Promise((resolve, reject) => {
+        srv.once('error', reject);
+        srv.listen(port, '127.0.0.1', resolve);
+      });
+    } catch (e) {
+      await new Promise((resolve) => server.close(resolve));
       server = null;
       baseUrl = null;
-      resolve();
-    });
-  });
+      await startFixtureServer();
+      continue;
+    }
+    crossOriginServer = srv;
+    crossOriginBaseUrl = `http://127.0.0.1:${port}`;
+    return crossOriginBaseUrl;
+  }
+  throw new Error('Could not bind the cross-origin fixture server');
+}
+
+async function stopFixtureServer() {
+  const close = (srv) => (srv ? new Promise((resolve) => srv.close(resolve)) : Promise.resolve());
+  await Promise.all([close(server), close(crossOriginServer)]);
+  server = null;
+  baseUrl = null;
+  crossOriginServer = null;
+  crossOriginBaseUrl = null;
 }
 
 function getBaseUrl() {
@@ -77,4 +119,15 @@ function getBaseUrl() {
   return baseUrl;
 }
 
-module.exports = { startFixtureServer, stopFixtureServer, getBaseUrl };
+function getCrossOriginBaseUrl() {
+  if (!crossOriginBaseUrl) throw new Error('Cross-origin fixture server not started');
+  return crossOriginBaseUrl;
+}
+
+module.exports = {
+  startFixtureServer,
+  startCrossOriginServer,
+  stopFixtureServer,
+  getBaseUrl,
+  getCrossOriginBaseUrl,
+};

@@ -54,6 +54,14 @@ describe('consent pre-step', () => {
     expect(stillThere).toBe(false);
   });
 
+  it('skips a partial-consent button that precedes the accept-all button', async () => {
+    await page.goto(`${getBaseUrl()}/consent-cookie-banner-partial.html`, { waitUntil: 'load' });
+    const found = await detectConsent(page);
+
+    expect(found.buttonSelector).toBe('#accept-all');
+    expect(found.buttonLabel).toBe('Alle akzeptieren');
+  });
+
   it('reports nothing on a page without an overlay', async () => {
     await page.goto(`${getBaseUrl()}/good-accessibility.html`, { waitUntil: 'load' });
     expect(await detectConsent(page)).toBeNull();

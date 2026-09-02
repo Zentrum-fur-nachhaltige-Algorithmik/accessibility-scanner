@@ -91,7 +91,9 @@ class NonTextContrastScanner extends BaseScanner {
       criteria: ['1.4.11'],
       passed: violations.length === 0,
       violations: violations,
-      incomplete: incomplete,
+      // What could not be measured from CSS (image or gradient backdrops,
+      // canvas) is a question for a reviewer, not a finding.
+      needsReview: incomplete.map((item) => this._toNeedsReview(item)),
       summary: {
         totalElementsChecked: await this.countCheckedElements(page),
         uiComponentIssues: violations.filter((v) => v.category === 'ui-component').length,
@@ -882,6 +884,38 @@ class NonTextContrastScanner extends BaseScanner {
     }
 
     return recommendations;
+  }
+
+  /**
+   * A component, graphic or canvas whose contrast could not be computed
+   * becomes a needs-review finding carrying what was measured.
+   */
+  _toNeedsReview(item) {
+    const details = item.details || {};
+    const measurements = {};
+    for (const [key, value] of Object.entries(details)) {
+      const t = typeof value;
+      if (value !== null && (t === 'number' || t === 'boolean' || t === 'string')) {
+        measurements[key] = value;
+      }
+    }
+    return this.formatViolation(
+      item.type,
+      'moderate',
+      item.description,
+      [{ selector: item.element }],
+      'https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html',
+      'info',
+      {
+        verdict: 'needs-review',
+        dossier: {
+          question: `Does ${item.element} reach 3:1 against what it is painted on (WCAG 1.4.11, ${item.category})?`,
+          element: { selector: item.element, html: null, role: null, name: null },
+          measurements,
+          context: { category: item.category, backgroundImage: details.backgroundImage || null },
+        },
+      }
+    );
   }
 }
 

@@ -80,9 +80,24 @@ dossier: {
 ```
 
 Report and UI show them in their own "Needs review" section, never among the
-findings. When a reviewer clears one (today only `llm-incomplete-reviewer`),
-it leaves `needsReview` and is recorded in the result's `reviewLog` as
-`{ ruleId, selector, verdict: 'pass', reason, by }`.
+findings. AAA findings take the same route: they are advisory for an AA target
+and appear there, not among the violations.
+
+A reviewer (today only `llm-incomplete-reviewer`) answers a question with
+`pass`, `fail` or `uncertain`. Pass and fail close it: the item leaves
+`needsReview` and is recorded in the result's `reviewLog` as
+`{ ruleId, selector, verdict, reason, by }`; a fail is represented by the
+reviewer's own violation, marked `adjudicated: true`. An uncertain item stays
+open for a human and carries the attempt as `review: { by, verdict, reason }`.
+A reviewer never invents a finding for a question it could not answer.
+
+Scanners whose measurement cannot reach an element (a component on an image
+or gradient, a canvas) return such items in `needsReview` rather than dropping
+them.
+
+The consent pre-step below skips controls that accept less than everything
+("Accept necessary only", "Nur notwendige akzeptieren"): clicking one records
+a consent the page did not give.
 
 ### Consent pre-step
 

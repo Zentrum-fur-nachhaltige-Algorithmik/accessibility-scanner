@@ -119,6 +119,92 @@ describe('reconcileIncompleteReviews', () => {
     expect(reviewLog).toHaveLength(0);
   });
 
+  it('closes a question the reviewer answered fail, and keeps the adjudicated violation', () => {
+    const p = new ScanPipeline();
+    const result = p.assembleResult('http://x', [
+      { scannerId: 'axe-core', passed: false, violations: [suspected] },
+      {
+        scannerId: 'llm-incomplete-reviewer',
+        passed: false,
+        violations: [
+          {
+            ruleId: 'video-caption',
+            severity: 'violation',
+            impact: 'serious',
+            description: 'confirmed: spoken dialogue, no captions',
+            nodes: [{ selector: 'video#intro' }],
+            wcagCriteria: ['1.2.2'],
+            adjudicated: true,
+            reviewedAxeRule: 'video-caption',
+            reviewedSelector: 'video#intro',
+          },
+        ],
+        summary: {
+          decided: [
+            {
+              axeRuleId: 'video-caption',
+              selector: 'video#intro',
+              verdict: 'fail',
+              reason: 'confirmed: spoken dialogue, no captions',
+            },
+          ],
+        },
+      },
+    ]);
+
+    expect(result.needsReview).toHaveLength(0);
+    expect(result.violations).toHaveLength(1);
+    expect(result.violations[0].adjudicated).toBe(true);
+    expect(result.reviewLog[0].verdict).toBe('fail');
+  });
+
+  it('keeps an uncertain item open and annotates the attempt', () => {
+    const p = new ScanPipeline();
+    const result = p.assembleResult('http://x', [
+      { scannerId: 'axe-core', passed: false, violations: [suspected] },
+      {
+        scannerId: 'llm-incomplete-reviewer',
+        passed: true,
+        violations: [],
+        summary: {
+          decided: [
+            {
+              axeRuleId: 'video-caption',
+              selector: 'video#intro',
+              verdict: 'uncertain',
+              reason: 'audio track state unknown',
+            },
+          ],
+        },
+      },
+    ]);
+
+    expect(result.needsReview).toHaveLength(1);
+    expect(result.needsReview[0].review).toEqual({
+      by: 'llm-incomplete-reviewer',
+      verdict: 'uncertain',
+      reason: 'audio track state unknown',
+    });
+    expect(result.reviewLog).toBeUndefined();
+  });
+
+  it('matches a needs-review item by its dossier selector', () => {
+    const p = new ScanPipeline();
+    const { kept, reviewLog } = p.reconcileIncompleteReviews(
+      [
+        {
+          scannerId: 'nontext-contrast',
+          ruleId: 'video-caption',
+          verdict: 'needs-review',
+          dossier: { element: { selector: 'video#intro' } },
+        },
+      ],
+      scannerResults
+    );
+    expect(kept).toHaveLength(0);
+    expect(reviewLog[0].selector).toBe('video#intro');
+  });
+
   it('decides any scanner needs-review item, not only axe severity info', () => {
     const p = new ScanPipeline();
     const { kept, reviewLog } = p.reconcileIncompleteReviews(

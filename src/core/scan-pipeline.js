@@ -315,46 +315,55 @@ class ScanPipeline {
   }
 
   /**
-   * Take the needs-review items a reviewer has since decided are compliant out
-   * of the reader's list and into the review log.
+   * Close the needs-review items a reviewer has since decided.
    *
    * A needs-review finding is an open question. `llm-incomplete-reviewer`
-   * answers some of them with measured evidence and records the ones it
-   * cleared in `summary.suppressed`. Without this reconciliation the reader
-   * sees both the answer AND the original question for the same element.
+   * answers some of them and lists every attempt in `summary.decided` as
+   * {axeRuleId, selector, verdict: pass|fail|uncertain, reason}. A `pass`
+   * leaves the reader's list for the review log; a `fail` leaves it too,
+   * because the reviewer's own adjudicated violation now stands for it;
+   * an `uncertain` stays and carries the attempt, so the reader sees that
+   * the question was tried and what was measured.
    *
    * Identity is (ruleId|selector), so any scanner's needs-review item can be
-   * decided, not only axe's. Cleared items are kept in `reviewLog` for
-   * precision measurement; the report does not render them.
+   * decided, not only axe's. The dossier selector is read as well as the
+   * finding's own, so a supplier that only fills the dossier still matches.
    *
    * @returns {{kept: Object[], reviewLog: Object[]}}
    */
   reconcileIncompleteReviews(needsReview, scannerResults) {
     const reviewer = scannerResults.find((r) => r.scannerId === 'llm-incomplete-reviewer');
-    const suppressed = reviewer?.summary?.suppressed;
-    if (!Array.isArray(suppressed) || suppressed.length === 0) {
+    const decided = Array.isArray(reviewer?.summary?.decided)
+      ? reviewer.summary.decided
+      : (reviewer?.summary?.suppressed || []).map((s) => ({ ...s, verdict: 'pass' }));
+    if (decided.length === 0) {
       return { kept: needsReview, reviewLog: [] };
     }
 
-    const reasons = new Map(
-      suppressed.map((s) => [`${s.axeRuleId}|${s.selector}`, s.reason || null])
-    );
+    const decisions = new Map(decided.map((d) => [`${d.axeRuleId}|${d.selector}`, d]));
+    const by = 'llm-incomplete-reviewer';
 
     const kept = [];
     const reviewLog = [];
     for (const v of needsReview) {
-      const selector = v.nodes?.[0]?.selector || v.element || '';
-      const key = `${v.ruleId || v.axeRuleId || ''}|${selector}`;
-      if (!reasons.has(key)) {
+      const ruleId = v.ruleId || v.axeRuleId || '';
+      const selectors = [v.nodes?.[0]?.selector, v.element, v.dossier?.element?.selector].filter(
+        Boolean
+      );
+      const decision = selectors.map((sel) => decisions.get(`${ruleId}|${sel}`)).find(Boolean);
+      if (!decision || decision.verdict === 'uncertain') {
+        if (decision) {
+          v.review = { by, verdict: 'uncertain', reason: decision.reason || null };
+        }
         kept.push(v);
         continue;
       }
       reviewLog.push({
-        ruleId: v.ruleId || v.axeRuleId || null,
-        selector,
-        verdict: 'pass',
-        reason: reasons.get(key),
-        by: 'llm-incomplete-reviewer',
+        ruleId: ruleId || null,
+        selector: selectors[0] || '',
+        verdict: decision.verdict,
+        reason: decision.reason || null,
+        by,
       });
     }
     return { kept, reviewLog };

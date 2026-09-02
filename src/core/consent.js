@@ -13,10 +13,17 @@
 // Wording heuristics lifted from the screen-reader agent branch
 // (src/agent/generic-tasks.js), English and German, matched case-insensitively.
 const CONTAINER_PATTERN = 'cookie|consent|gdpr|dsgvo|datenschutz-?banner|cmp';
-// ok needs its word boundary: a bare `ok` is a substring of "cookie" and would
-// send the click to a "Cookie-Einstellungen" settings control.
+// Word boundaries throughout: a bare `ok` is a substring of "cookie" and
+// would send the click to a "Cookie-Einstellungen" settings control.
 const ACCEPT_PATTERN =
-  'accept|allow|agree|ok\\b|got it|akzeptieren|zustimmen|einverstanden|verstanden|erlauben';
+  '\\b(accept|allow|agree|ok|got it|akzeptieren|zustimmen|einverstanden|verstanden|erlauben)\\b';
+// A control that accepts less than everything ("Accept necessary only",
+// "Allow selection", "Nur notwendige akzeptieren") also matches the accept
+// wording. Clicking it records a consent the page did not give, and it often
+// precedes the real button in DOM order, so it is excluded.
+const PARTIAL_PATTERN =
+  '\\b(necessary|essential|required|selection|selected|only|reject|decline|refuse|manage|settings|customi[sz]e|preferences|' +
+  'notwendig\\w*|erforderlich\\w*|essenziell\\w*|auswahl|nur|ablehnen|verweigern|verwalten|einstellungen|anpassen)\\b';
 
 /**
  * Find the consent overlay and its accept control.
@@ -26,9 +33,10 @@ const ACCEPT_PATTERN =
  */
 async function detectConsent(page) {
   return page.evaluate(
-    (containerPattern, acceptPattern) => {
+    (containerPattern, acceptPattern, partialPattern) => {
       const containerRx = new RegExp(containerPattern, 'i');
       const acceptRx = new RegExp(acceptPattern, 'i');
+      const partialRx = new RegExp(partialPattern, 'i');
 
       function isVisible(el) {
         if (!el || !el.getBoundingClientRect) return false;
@@ -94,7 +102,7 @@ async function detectConsent(page) {
           )
         )
           .filter(isVisible)
-          .find((el) => acceptRx.test(label(el)));
+          .find((el) => acceptRx.test(label(el)) && !partialRx.test(label(el)));
         if (button) {
           return {
             containerSelector: selectorFor(container),
@@ -107,7 +115,8 @@ async function detectConsent(page) {
       return null;
     },
     CONTAINER_PATTERN,
-    ACCEPT_PATTERN
+    ACCEPT_PATTERN,
+    PARTIAL_PATTERN
   );
 }
 
@@ -159,4 +168,10 @@ async function dismissConsent(page) {
   return result;
 }
 
-module.exports = { detectConsent, dismissConsent, CONTAINER_PATTERN, ACCEPT_PATTERN };
+module.exports = {
+  detectConsent,
+  dismissConsent,
+  CONTAINER_PATTERN,
+  ACCEPT_PATTERN,
+  PARTIAL_PATTERN,
+};

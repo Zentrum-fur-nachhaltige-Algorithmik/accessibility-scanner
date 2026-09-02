@@ -1,0 +1,50 @@
+<!-- WCAG-TEST
+criterion: 1.3.1, 3.3.1, 3.3.2
+level: A
+title: Group named by the heading above it, and an error text the field points at
+test_type: good
+expected_violations: 0
+testable_by: dom
+scanners: error-handling
+description: A checkbox list whose options are individually labelled under a heading that names the question, a field marked invalid whose message is associated with aria-errormessage, a field marked invalid whose message only stands beside it (a needs-review question, never a violation), and a pattern field whose format is stated in its description. No violation may be reported.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Preferences</title>
+<style>
+  body { font-family: system-ui, Arial, sans-serif; color: #1a1a1a; background: #ffffff; margin: 1rem; line-height: 1.5; }
+  label { display: block; margin-top: .5rem; }
+  .error { color: #a4000f; }
+  :focus-visible { outline: 3px solid #1a1a1a; outline-offset: 2px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Preferences</h1>
+
+  <form action="/preferences" method="post">
+    <h2>Which newsletters would you like?</h2>
+    <label><input type="checkbox" name="news" value="weekly"> Weekly digest</label>
+    <label><input type="checkbox" name="news" value="offers"> Offers</label>
+
+    <label for="email">E-mail</label>
+    <input id="email" name="email" type="email" value="not-an-address"
+           aria-invalid="true" aria-errormessage="email-error">
+    <p id="email-error" class="error">Enter an e-mail address, for example name@example.org.</p>
+
+    <label for="city">City</label>
+    <input id="city" name="city" value="" aria-invalid="true">
+    <p class="error">Enter the city the delivery goes to.</p>
+
+    <label for="zip">Postcode</label>
+    <input id="zip" name="zip" type="text" pattern="[0-9]{5}" aria-describedby="zip-hint">
+    <p id="zip-hint">Five digits, for example 10115.</p>
+
+    <button type="submit">Save</button>
+  </form>
+</main>
+</body>
+</html>

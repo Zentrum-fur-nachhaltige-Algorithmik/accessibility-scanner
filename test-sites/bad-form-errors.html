@@ -276,6 +276,22 @@ description: Poor error identification, suggestions, and prevention
         </div>
     </div>
     
+    <!-- VIOLATION 5b: Feld als fehlerhaft markiert, ohne Fehlertext -->
+    <div class="violation-section">
+        <div class="violation-title">VIOLATION 5b: aria-invalid ohne Fehlertext (WCAG 3.3.1)</div>
+        <p><strong>Problem:</strong> Das Feld meldet einen Fehler, aber nirgends steht, was falsch ist</p>
+        <div class="form-container">
+            <form id="coupon-form-bad">
+                <div class="form-group">
+                    <label for="coupon-bad">Gutscheincode:</label>
+                    <!-- SCHLECHT: aria-invalid="true", keine Beschreibung, kein sichtbarer Text -->
+                    <input type="text" id="coupon-bad" value="ABC" aria-invalid="true">
+                </div>
+                <button type="submit">Einlösen</button>
+            </form>
+        </div>
+    </div>
+
     <!-- VIOLATION 6: Unzusammenhängende Fehlermeldungen -->
     <div class="violation-section">
         <div class="violation-title">VIOLATION 6: Fehlermeldungen ohne Feldzuordnung</div>

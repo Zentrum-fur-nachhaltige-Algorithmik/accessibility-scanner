@@ -1126,6 +1126,24 @@ const HTML_SCANNER_MAPPING = {
       'Cards that name every link differently, and Cancel/Close/Save buttons: neither is an inconsistent identification',
   },
 
+  'bad-group-and-format.html': {
+    expectedScanners: ['error-handling'],
+    excludedScanners: ['color-contrast', 'use-of-color'],
+    testType: 'bad',
+    wcagCriteria: ['1.3.1', '3.3.2'],
+    description:
+      'A same-name radio pair with no group container and no heading, a fieldset without a legend, and a pattern field that states no format: the radio group is reported on the group, never on the form',
+  },
+
+  'good-group-heading-and-error-text.html': {
+    expectedScanners: [],
+    excludedScanners: ['error-handling'],
+    testType: 'good',
+    wcagCriteria: ['1.3.1', '3.3.1', '3.3.2'],
+    description:
+      'Same-name checkboxes under the heading that names the question, an error text bound with aria-errormessage, an error text that only stands beside its field (a question, not a violation), and a stated format',
+  },
+
   'good-form-fields-without-hints.html': {
     expectedScanners: [],
     excludedScanners: ['error-handling'],

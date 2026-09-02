@@ -209,6 +209,15 @@ const MANUAL_OVERRIDES = {
       'Location (AAA): whether a user can determine their position requires the ' +
       'surrounding set of pages and its information architecture, not one page.',
   },
+  '3.3.3': {
+    mechanism: MECHANISM.MANUAL,
+    justification:
+      'Error Suggestion: the clause starts at "If an input error is automatically detected", and ' +
+      'no scanner here enters data, submits a form or reads a validity state, so the antecedent ' +
+      'is never reached. An unstated required format is a missing instruction under 3.3.2 ' +
+      '(technique G89) and is reported there; the suggestion after a detected error needs a ' +
+      'state scan or a human.',
+  },
   '3.3.4': {
     mechanism: MECHANISM.MANUAL,
     justification:

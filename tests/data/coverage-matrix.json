@@ -1,5 +1,5 @@
 {
-  "fixtureCount": 249,
+  "fixtureCount": 263,
   "scanners": [
     {
       "id": "axe-core",
@@ -1446,7 +1446,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 12,
+        "runs": 11,
         "from": [
           "exclusive"
         ]
@@ -1469,7 +1469,9 @@
       "llm": [],
       "fixtures": {
         "good": [
-          "good-keyboard-trap.html"
+          "good-dialog-close-controls.html",
+          "good-keyboard-trap.html",
+          "good-widget-exit-by-escape.html"
         ],
         "bad": [
           "bad-keyboard-access.html",
@@ -1483,7 +1485,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 3,
+        "runs": 5,
         "from": [
           "exclusive"
         ]
@@ -1535,7 +1537,8 @@
       "fixtures": {
         "good": [
           "good-accesskeys-and-widget-keys.html",
-          "good-character-key-shortcuts.html"
+          "good-character-key-shortcuts.html",
+          "good-keydown-analytics-attribute.html"
         ],
         "bad": [
           "bad-character-key-shortcuts.html"
@@ -1547,7 +1550,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 3,
+        "runs": 4,
         "from": [
           "exclusive"
         ]
@@ -1904,6 +1907,7 @@
       "fixtures": {
         "good": [
           "good-page-titled.html",
+          "good-spa-filter-and-tabbar.html",
           "good-spa-route-change.html"
         ],
         "bad": [
@@ -1918,7 +1922,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 2,
+        "runs": 3,
         "from": [
           "exclusive"
         ]
@@ -1945,9 +1949,12 @@
       "fixtures": {
         "good": [
           "good-dialog-already-open.html",
+          "good-dialog-slow-transition.html",
           "good-dismiss-and-load-more.html",
           "good-focus-management.html",
           "good-rtl-tab-order.html",
+          "good-search-first-tabindex.html",
+          "good-spa-filter-and-tabbar.html",
           "good-spa-route-change.html",
           "good-two-column-tab-order.html"
         ],
@@ -1963,7 +1970,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 9,
+        "runs": 12,
         "from": [
           "exclusive"
         ]
@@ -2318,7 +2325,8 @@
       "fixtures": {
         "good": [
           "good-keyboard-native-override.html",
-          "good-pointer-labels-and-alternatives.html"
+          "good-pointer-labels-and-alternatives.html",
+          "good-swipe-carousel-with-buttons.html"
         ],
         "bad": [
           "bad-input-modalities.html",
@@ -2331,7 +2339,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 4,
+        "runs": 5,
         "from": [
           "exclusive"
         ]
@@ -2355,7 +2363,8 @@
       "fixtures": {
         "good": [
           "good-pointer-cancellation.html",
-          "good-pointer-labels-and-alternatives.html"
+          "good-pointer-labels-and-alternatives.html",
+          "good-press-preview-and-ripple.html"
         ],
         "bad": [
           "bad-input-modalities.html",
@@ -2368,7 +2377,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 4,
+        "runs": 5,
         "from": [
           "exclusive"
         ]
@@ -2430,6 +2439,7 @@
       "fixtures": {
         "good": [
           "good-motion-vestibular.html",
+          "good-parallax-tilt.html",
           "good-pointer-labels-and-alternatives.html"
         ],
         "bad": [
@@ -2443,7 +2453,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 4,
+        "runs": 5,
         "from": [
           "exclusive"
         ]
@@ -2491,6 +2501,7 @@
       "fixtures": {
         "good": [
           "good-concurrent-input.html",
+          "good-map-canvas-gestures.html",
           "good-touch-and-pointer-alternatives.html"
         ],
         "bad": [
@@ -2503,7 +2514,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 3,
+        "runs": 4,
         "from": [
           "exclusive"
         ]
@@ -2562,6 +2573,7 @@
       "llm": [],
       "fixtures": {
         "good": [
+          "good-icon-link-with-equivalent.html",
           "good-inline-text-links.html",
           "good-pointer-labels-and-alternatives.html",
           "good-target-size-lazy-banner.html",
@@ -2579,7 +2591,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 6,
+        "runs": 7,
         "from": [
           "exclusive"
         ]
@@ -3370,6 +3382,9 @@
         "good": [
           "good-account-menu-no-counter.html",
           "good-aria-state-updates.html",
+          "good-bootstrap-error-decoration.html",
+          "good-progress-with-value.html",
+          "good-search-results-and-tabs.html",
           "good-static-status-containers.html"
         ],
         "bad": [
@@ -3383,7 +3398,7 @@
       "outcome": {
         "tp": true,
         "fpClean": true,
-        "runs": 5,
+        "runs": 8,
         "from": [
           "exclusive"
         ]

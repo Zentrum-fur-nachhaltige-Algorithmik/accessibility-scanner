@@ -1,5 +1,5 @@
 {
-  "recordedAt": "2026-08-30T11:56:12.404Z",
+  "recordedAt": "2026-09-02T17:22:15.228Z",
   "profile": "standard",
   "labelsRecordedAt": "2026-08-28",
   "snapshots": [
@@ -9,7 +9,7 @@
     },
     {
       "file": "med-theme.html",
-      "findings": 14
+      "findings": 12
     },
     {
       "file": "beeproduced.html",
@@ -17,11 +17,11 @@
     },
     {
       "file": "wiki-medical-de.html",
-      "findings": 217
+      "findings": 215
     },
     {
       "file": "modern-commercial.html",
-      "findings": 46
+      "findings": 43
     },
     {
       "file": "gov-uk-guide.html",
@@ -41,15 +41,15 @@
     },
     {
       "file": "broadcaster-news.html",
-      "findings": 67
+      "findings": 63
     },
     {
       "file": "wiki-accessibility-en.html",
-      "findings": 19
+      "findings": 21
     },
     {
       "file": "maler-staepke.html",
-      "findings": 13
+      "findings": 12
     },
     {
       "file": "muenchen-portal.html",
@@ -99,13 +99,13 @@
       "scanners": [
         "input-modalities"
       ],
-      "reported": 317,
-      "true": 74,
+      "reported": 312,
+      "true": 71,
       "false": 0,
       "review": 0,
       "artefact": 0,
-      "unstyled": 232,
-      "unlabelled": 11,
+      "unstyled": 228,
+      "unlabelled": 13,
       "precisionFrom": [
         "broadcaster-news.html",
         "maler-staepke.html",
@@ -362,23 +362,6 @@
       "precision": 1
     },
     {
-      "rule": "aria-hidden-focus",
-      "scanners": [
-        "axe-core"
-      ],
-      "reported": 3,
-      "true": 2,
-      "false": 0,
-      "review": 1,
-      "artefact": 0,
-      "unstyled": 0,
-      "unlabelled": 0,
-      "precisionFrom": [
-        "wiki-medical-de.html"
-      ],
-      "precision": 1
-    },
-    {
       "rule": "incomplete-content",
       "scanners": [
         "accessibility-statement"
@@ -413,19 +396,21 @@
       "precision": 1
     },
     {
-      "rule": "aria-valid-attr-value",
+      "rule": "aria-hidden-focus",
       "scanners": [
         "axe-core"
       ],
       "reported": 2,
-      "true": 0,
+      "true": 2,
       "false": 0,
-      "review": 2,
+      "review": 0,
       "artefact": 0,
       "unstyled": 0,
       "unlabelled": 0,
-      "precisionFrom": [],
-      "precision": null
+      "precisionFrom": [
+        "wiki-medical-de.html"
+      ],
+      "precision": 1
     },
     {
       "rule": "focus-obscured-by-fixed-element",
@@ -477,21 +462,6 @@
       "precision": 1
     },
     {
-      "rule": "aria-prohibited-attr",
-      "scanners": [
-        "axe-core"
-      ],
-      "reported": 1,
-      "true": 0,
-      "false": 0,
-      "review": 1,
-      "artefact": 0,
-      "unstyled": 0,
-      "unlabelled": 0,
-      "precisionFrom": [],
-      "precision": null
-    },
-    {
       "rule": "blink",
       "scanners": [
         "axe-core"
@@ -522,23 +492,6 @@
       "unlabelled": 0,
       "precisionFrom": [
         "broadcaster-news.html"
-      ],
-      "precision": 1
-    },
-    {
-      "rule": "bypass",
-      "scanners": [
-        "axe-core"
-      ],
-      "reported": 1,
-      "true": 1,
-      "false": 0,
-      "review": 0,
-      "artefact": 0,
-      "unstyled": 0,
-      "unlabelled": 0,
-      "precisionFrom": [
-        "maler-staepke.html"
       ],
       "precision": 1
     },
@@ -644,6 +597,21 @@
     }
   ],
   "missingTrue": [
+    {
+      "snapshot": "broadcaster-news.html",
+      "rule": "target-too-small",
+      "selector": "a.London-styles__LondonMediaAnchorStyled-sc-269f9f6d-4"
+    },
+    {
+      "snapshot": "maler-staepke.html",
+      "rule": "bypass",
+      "selector": "html"
+    },
+    {
+      "snapshot": "hilfsgemeinschaft.html",
+      "rule": "focus-obscured-by-fixed-element",
+      "selector": "div.frame-inner > div.lookapp-scope > p:nth-of-type(1) > a.btn.btn-lg"
+    },
     {
       "snapshot": "hilfsgemeinschaft.html",
       "rule": "focus-obscured-by-fixed-element",

@@ -1,14 +1,14 @@
 {
-  "startedAt": "2026-08-30T11:03:50.728Z",
+  "startedAt": "2026-09-02T16:37:56.599Z",
   "profile": "standard",
   "llmEnabled": false,
-  "perFileTimeoutMs": 600000,
+  "perFileTimeoutMs": 900000,
   "parallel": 3,
   "files": [
     {
       "file": "own-audit-ui.html",
       "source": "http://localhost:3111/audit (this repo's own Next.js frontend)",
-      "elapsedMs": 71061,
+      "elapsedMs": 70195,
       "timedOut": false,
       "totalViolations": 3,
       "band": [
@@ -44,9 +44,9 @@
     {
       "file": "med-theme.html",
       "source": "https://dr-mauermann-urologe.vercel.app",
-      "elapsedMs": 73851,
+      "elapsedMs": 74612,
       "timedOut": false,
-      "totalViolations": 14,
+      "totalViolations": 12,
       "band": [
         7,
         28
@@ -77,7 +77,7 @@
       "scannerCount": 26,
       "perScanner": {
         "axe-core": 1,
-        "input-modalities": 12,
+        "input-modalities": 10,
         "accessibility-statement": 1
       },
       "expectedScannerCount": 26,
@@ -88,7 +88,7 @@
     {
       "file": "beeproduced.html",
       "source": "https://beeproduced.com",
-      "elapsedMs": 108601,
+      "elapsedMs": 135529,
       "timedOut": false,
       "totalViolations": 6,
       "band": [
@@ -138,17 +138,17 @@
     {
       "file": "wiki-medical-de.html",
       "source": "https://de.wikipedia.org/wiki/Prostatakarzinom",
-      "elapsedMs": 525781,
+      "elapsedMs": 465486,
       "timedOut": false,
-      "totalViolations": 217,
+      "totalViolations": 190,
       "band": [
         108,
         434
       ],
       "scannerErrors": [
         {
-          "scanner": "predictable-navigation",
-          "error": "Navigation timeout of 45000 ms exceeded"
+          "scanner": "axe-core",
+          "error": "Page/Frame is not ready"
         }
       ],
       "missingScanners": [],
@@ -156,8 +156,8 @@
         {
           "name": "REAL: images with no alt attribute at all",
           "kind": "must-detect",
-          "ok": true,
-          "detail": null
+          "ok": false,
+          "detail": "no missing-alt violation reported despite 12 <img> elements without an alt attribute"
         },
         {
           "name": "CLEAN: <html lang=\"de\"> itself is not flagged",
@@ -180,17 +180,16 @@
         {
           "name": "REAL: data table has a completely empty <th> corner cell",
           "kind": "must-detect",
-          "ok": true,
-          "detail": null
+          "ok": false,
+          "detail": "no empty-table-header violation reported despite <th id=\"mwAVM\"></th>"
         }
       ],
-      "bestPractices": 25,
+      "bestPractices": 0,
       "scannerCount": 26,
       "perScanner": {
-        "axe-core": 26,
         "error-handling": 3,
         "label-in-name": 4,
-        "input-modalities": 180,
+        "input-modalities": 179,
         "responsive-design": 3,
         "accessibility-statement": 1
       },
@@ -202,9 +201,9 @@
     {
       "file": "modern-commercial.html",
       "source": "https://www.mozilla.org/de/",
-      "elapsedMs": 183106,
+      "elapsedMs": 279497,
       "timedOut": false,
-      "totalViolations": 46,
+      "totalViolations": 43,
       "band": [
         23,
         92
@@ -246,23 +245,23 @@
       "bestPractices": 1,
       "scannerCount": 26,
       "perScanner": {
-        "axe-core": 3,
+        "axe-core": 1,
         "error-handling": 1,
         "page-structure": 1,
         "input-purpose": 3,
-        "input-modalities": 37,
+        "input-modalities": 36,
         "responsive-design": 1,
         "accessibility-statement": 1
       },
       "expectedScannerCount": 26,
       "bandOk": true,
-      "slow": false,
+      "slow": true,
       "noise": []
     },
     {
       "file": "gov-uk-guide.html",
       "source": "https://www.gov.uk/vehicle-tax",
-      "elapsedMs": 109607,
+      "elapsedMs": 129537,
       "timedOut": false,
       "totalViolations": 1,
       "band": [
@@ -316,7 +315,7 @@
     {
       "file": "webaim-article.html",
       "source": "https://webaim.org/techniques/skipnav/",
-      "elapsedMs": 112663,
+      "elapsedMs": 170440,
       "timedOut": false,
       "totalViolations": 15,
       "band": [
@@ -367,7 +366,7 @@
     {
       "file": "govuk-design-system.html",
       "source": "https://design-system.service.gov.uk/components/text-input/",
-      "elapsedMs": 183067,
+      "elapsedMs": 293544,
       "timedOut": false,
       "totalViolations": 16,
       "band": [
@@ -396,7 +395,7 @@
           "detail": null
         }
       ],
-      "bestPractices": 12,
+      "bestPractices": 2,
       "scannerCount": 26,
       "perScanner": {
         "page-structure": 1,
@@ -404,13 +403,13 @@
       },
       "expectedScannerCount": 26,
       "bandOk": true,
-      "slow": false,
+      "slow": true,
       "noise": []
     },
     {
       "file": "a11y-project-checklist.html",
       "source": "https://www.a11yproject.com/checklist/",
-      "elapsedMs": 169051,
+      "elapsedMs": 294362,
       "timedOut": false,
       "totalViolations": 5,
       "band": [
@@ -448,15 +447,15 @@
       },
       "expectedScannerCount": 26,
       "bandOk": true,
-      "slow": false,
+      "slow": true,
       "noise": []
     },
     {
       "file": "broadcaster-news.html",
       "source": "https://www.bbc.com/news",
-      "elapsedMs": 180393,
+      "elapsedMs": 354827,
       "timedOut": false,
-      "totalViolations": 67,
+      "totalViolations": 63,
       "band": [
         33,
         134
@@ -483,24 +482,24 @@
           "detail": null
         }
       ],
-      "bestPractices": 7,
+      "bestPractices": 6,
       "scannerCount": 26,
       "perScanner": {
-        "axe-core": 3,
-        "input-modalities": 62,
+        "axe-core": 2,
+        "input-modalities": 59,
         "accessibility-statement": 2
       },
       "expectedScannerCount": 26,
       "bandOk": true,
-      "slow": false,
+      "slow": true,
       "noise": []
     },
     {
       "file": "wiki-accessibility-en.html",
       "source": "https://en.wikipedia.org/wiki/Web_accessibility",
-      "elapsedMs": 589339,
+      "elapsedMs": 706957,
       "timedOut": false,
-      "totalViolations": 19,
+      "totalViolations": 21,
       "band": [
         9,
         38
@@ -509,10 +508,6 @@
         {
           "scanner": "axe-core",
           "error": "Page/Frame is not ready"
-        },
-        {
-          "scanner": "keyboard-navigation",
-          "error": "Navigation timeout of 45000 ms exceeded"
         }
       ],
       "missingScanners": [],
@@ -534,7 +529,7 @@
       "scannerCount": 26,
       "perScanner": {
         "page-structure": 9,
-        "input-modalities": 9,
+        "input-modalities": 11,
         "accessibility-statement": 1
       },
       "expectedScannerCount": 26,
@@ -545,9 +540,9 @@
     {
       "file": "maler-staepke.html",
       "source": "https://www.maler-staepke.de/de.html",
-      "elapsedMs": 56575,
+      "elapsedMs": 72023,
       "timedOut": false,
-      "totalViolations": 13,
+      "totalViolations": 12,
       "band": [
         6,
         26
@@ -571,7 +566,7 @@
       "bestPractices": 5,
       "scannerCount": 26,
       "perScanner": {
-        "axe-core": 4,
+        "axe-core": 3,
         "multiple-ways": 1,
         "input-modalities": 2,
         "responsive-design": 5,
@@ -585,7 +580,7 @@
     {
       "file": "muenchen-portal.html",
       "source": "https://www.muenchen.de/",
-      "elapsedMs": 165864,
+      "elapsedMs": 241167,
       "timedOut": false,
       "totalViolations": 13,
       "band": [
@@ -619,13 +614,13 @@
       },
       "expectedScannerCount": 26,
       "bandOk": true,
-      "slow": false,
+      "slow": true,
       "noise": []
     },
     {
       "file": "spiegel-news.html",
       "source": "https://www.spiegel.de/",
-      "elapsedMs": 150168,
+      "elapsedMs": 200160,
       "timedOut": false,
       "totalViolations": 26,
       "band": [
@@ -664,14 +659,19 @@
     {
       "file": "oesterreich-gv.html",
       "source": "https://www.oesterreich.gv.at/",
-      "elapsedMs": 115984,
+      "elapsedMs": 316492,
       "timedOut": false,
       "totalViolations": 0,
       "band": [
         0,
         0
       ],
-      "scannerErrors": [],
+      "scannerErrors": [
+        {
+          "scanner": "hover-focus-content",
+          "error": "Navigation timeout of 45000 ms exceeded"
+        }
+      ],
       "missingScanners": [],
       "spotTruths": [
         {
@@ -694,13 +694,13 @@
       },
       "expectedScannerCount": 26,
       "bandOk": true,
-      "slow": false,
+      "slow": true,
       "noise": []
     },
     {
       "file": "hilfsgemeinschaft.html",
       "source": "https://www.hilfsgemeinschaft.at/",
-      "elapsedMs": 159114,
+      "elapsedMs": 200836,
       "timedOut": false,
       "totalViolations": 4,
       "band": [
@@ -736,13 +736,23 @@
       "noise": []
     }
   ],
-  "finishedAt": "2026-08-30T11:22:00.008Z",
+  "finishedAt": "2026-09-02T17:00:36.181Z",
   "failures": [
     {
       "layer": "no-crash",
       "file": "wiki-medical-de.html",
-      "scanner": "predictable-navigation",
-      "detail": "Navigation timeout of 45000 ms exceeded"
+      "scanner": "axe-core",
+      "detail": "Page/Frame is not ready"
+    },
+    {
+      "layer": "spot-truth",
+      "file": "wiki-medical-de.html",
+      "detail": "REAL: images with no alt attribute at all: no missing-alt violation reported despite 12 <img> elements without an alt attribute"
+    },
+    {
+      "layer": "spot-truth",
+      "file": "wiki-medical-de.html",
+      "detail": "REAL: data table has a completely empty <th> corner cell: no empty-table-header violation reported despite <th id=\"mwAVM\"></th>"
     },
     {
       "layer": "no-crash",
@@ -752,8 +762,8 @@
     },
     {
       "layer": "no-crash",
-      "file": "wiki-accessibility-en.html",
-      "scanner": "keyboard-navigation",
+      "file": "oesterreich-gv.html",
+      "scanner": "hover-focus-content",
       "detail": "Navigation timeout of 45000 ms exceeded"
     }
   ],

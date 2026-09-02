@@ -2,7 +2,8 @@
  * LLM Focus Appearance Scanner
  * Covers 2.4.12 Focus Not Obscured (Enhanced) and 2.4.13 Focus Appearance (AAA).
  * Focus states come from a real keyboard tab walk plus a per-element hit test;
- * 2.4.13 findings are rejected in code when every indicator measures as sufficient.
+ * findings become needs-review questions carrying that measurement, and a
+ * 2.4.13 question is rejected in code when the indicator measures as sufficient.
  */
 
 const LLMBaseScanner = require('./base');
@@ -230,6 +231,8 @@ ${facts.length ? facts.join('\n') + '\n' : ''}
 Measured keyboard tab stops (focused state):
 ${JSON.stringify(stops)}
 
+Everything you report becomes a question for a human reviewer, never an automatic failure.
+
 Return violations as JSON; return an empty array when the measurements show no failure.`;
   }
 
@@ -240,56 +243,71 @@ Return violations as JSON; return an empty array when the measurements show no f
     // Nothing keyboard-reachable → neither criterion can be evaluated, and no
     // LLM call is worth paying for.
     if (stops.length === 0) {
-      return {
-        scannerId: this.id,
-        passed: true,
-        violations: [],
-        summary: {
-          totalIssues: 0,
-          llmModel: 'not-called',
-          criteriaChecked: ['2.4.12', '2.4.13'],
-          tabStops: 0,
-          skippedReason: 'no keyboard-reachable elements',
-        },
-      };
+      return this.reviewResult([], {
+        llmModel: 'not-called',
+        criteriaChecked: ['2.4.12', '2.4.13'],
+        tabStops: 0,
+        skippedReason: 'no keyboard-reachable elements',
+      });
     }
 
     const prompt = this.buildPrompt(stops, guards);
     const { violations: raw, summary: ctx } = await this.analyzePageChunked(page, prompt);
-    const converted = this.convertViolations(raw);
+    const converted = this.convertViolations(raw, {
+      model: ctx.llmModel,
+      measurements: { tabStops: stops.length, tabStopsTruncated: truncated },
+      bySelector: this._dossierData(stops),
+    });
 
-    // Code guard: drop findings the measurement already disproved.
-    const violations = [];
+    // Code guard: drop questions the measurement already answered.
+    const needsReview = [];
     const rejected = [];
     for (const v of converted) {
       const reason = this.rejectionReason(v, guards);
       if (reason) rejected.push({ ruleId: v.ruleId, description: v.description, reason });
-      else violations.push(v);
+      else needsReview.push(v);
     }
 
-    return {
-      scannerId: this.id,
-      passed: violations.length === 0,
-      violations,
-      summary: {
-        totalIssues: violations.length,
-        llmModel: ctx.llmModel || 'unknown',
-        criteriaChecked: ['2.4.12', '2.4.13'],
-        wcagLevel: 'AAA',
-        tabStops: stops.length,
-        tabStopsTruncated: truncated,
-        allIndicatorsCompliant: guards.allIndicatorsCompliant,
-        minIndicatorContrast: guards.minIndicatorContrast,
-        obscuredStops: guards.obscuredStops.length,
-        guardRejected: rejected.length,
-        guardRejectedDetails: rejected,
-        analyzedFraction: ctx.analyzedFraction,
-        rawChars: ctx.rawChars,
-        skeletonChars: ctx.skeletonChars,
-        chunkCount: ctx.chunkCount,
-        truncated: ctx.truncated,
-      },
-    };
+    return this.reviewResult(needsReview, {
+      llmModel: ctx.llmModel || 'unknown',
+      criteriaChecked: ['2.4.12', '2.4.13'],
+      wcagLevel: 'AAA',
+      tabStops: stops.length,
+      tabStopsTruncated: truncated,
+      allIndicatorsCompliant: guards.allIndicatorsCompliant,
+      minIndicatorContrast: guards.minIndicatorContrast,
+      obscuredStops: guards.obscuredStops.length,
+      guardRejected: rejected.length,
+      guardRejectedDetails: rejected,
+      analyzedFraction: ctx.analyzedFraction,
+      rawChars: ctx.rawChars,
+      skeletonChars: ctx.skeletonChars,
+      chunkCount: ctx.chunkCount,
+      truncated: ctx.truncated,
+    });
+  }
+
+  /** selector -> the tab stop's own measured focus state, for its dossier. */
+  _dossierData(stops) {
+    const out = {};
+    for (const s of stops) {
+      out[s.selector] = {
+        element: { html: null, role: null, name: s.text || null },
+        measurements: {
+          tag: s.tag,
+          indicatorVisible: s.indicatorVisible,
+          outline: s.outline,
+          outlineWidthPx: s.outlineWidthPx,
+          indicatorContrast: s.indicatorContrast,
+          lowContrastIndicator: s.lowContrastIndicator,
+          obscuredPoints: s.obscured
+            ? `${s.obscured.coveredPoints ?? 0}/${s.obscured.sampledPoints ?? 0}`
+            : null,
+          obscuredBy: s.obscured ? s.obscured.coveredBy : null,
+        },
+      };
+    }
+    return out;
   }
 
   /**

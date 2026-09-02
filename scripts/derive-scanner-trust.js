@@ -23,6 +23,13 @@ const NOISE_LIMIT = 10;
 /** Judged findings a rule needs before its precision counts as evidence. */
 const MIN_JUDGED_FINDINGS = 3;
 
+/** Runs an LLM rule needs in the stability record before it counts. */
+const MIN_LLM_RUNS = 3;
+
+/** Agreement across those runs, and precision against the fixture labels. */
+const MIN_LLM_AGREEMENT = 0.9;
+const MIN_LLM_PRECISION = 0.9;
+
 /** Externally validated base engine; always in the default profiles. */
 const ALWAYS_PROVEN = new Set(['axe-core']);
 
@@ -57,8 +64,70 @@ function collectScannerIds() {
  *
  * Each input file is optional: a missing file contributes no evidence.
  */
+/**
+ * Per-scanner rows of the LLM stability record, or null when no record exists.
+ *
+ * @returns {Map<string, Object[]>|null} scannerId -> rule rows
+ */
+function llmStability() {
+  const data = readJson('harness-llm.json');
+  if (!data) return null;
+  const byScanner = new Map();
+  for (const r of data.rules || []) {
+    const id = r.scanner || (typeof r.rule === 'string' ? r.rule.split('/')[0] : null);
+    if (!id) continue;
+    if (!byScanner.has(id)) byScanner.set(id, []);
+    byScanner.get(id).push(r);
+  }
+  return byScanner;
+}
+
+/**
+ * Why this LLM scanner is not proven, or an empty list when it is.
+ *
+ * @param {string} id
+ * @param {Map<string, Object[]>|null} stability
+ * @returns {string[]} evidence lines
+ */
+function llmFailures(id, stability) {
+  if (!stability) {
+    return [
+      'LLM scanner: no stability record (tests/data/harness/harness-llm.json is missing; ' +
+        `run harness:llm --runs ${MIN_LLM_RUNS} --json)`,
+    ];
+  }
+  const rules = stability.get(id) || [];
+  if (rules.length === 0) {
+    return [`LLM scanner: no stability record for ${id} in harness-llm.json`];
+  }
+  const out = [];
+  for (const r of rules) {
+    const name = r.rule || id;
+    const runs = r.runs || 0;
+    const agreement = r.agreement == null ? null : Number(r.agreement);
+    const precision = r.precision == null ? null : Number(r.precision);
+    if (runs < MIN_LLM_RUNS) {
+      out.push(`llm stability: ${name} recorded ${runs} run(s), needs ${MIN_LLM_RUNS}`);
+    }
+    if (agreement === null || agreement < MIN_LLM_AGREEMENT) {
+      out.push(
+        `llm stability: ${name} agreement ${agreement ?? 'not recorded'} across runs ` +
+          `(needs ${MIN_LLM_AGREEMENT})`
+      );
+    }
+    if (precision === null || precision < MIN_LLM_PRECISION) {
+      out.push(
+        `llm precision: ${name} ${precision ?? 'not recorded'} against the fixture labels ` +
+          `(needs ${MIN_LLM_PRECISION})`
+      );
+    }
+  }
+  return out;
+}
+
 function derive() {
   const scanners = collectScannerIds();
+  const stability = llmStability();
 
   /** @type {Map<string, string[]>} scannerId -> failure evidence lines */
   const evidence = new Map();
@@ -151,28 +220,20 @@ function derive() {
       };
       continue;
     }
-    if (kind === 'llm') {
-      trust[id] = {
-        tier: 'proven',
-        kind,
-        reason:
-          'LLM scanner: measured by scripts/harness/llm.js (violation-level ' +
-          'ground truth, German pair, injection and long-page robustness), not by the ' +
-          'deterministic fixture harnesses.',
-      };
-      continue;
-    }
-
-    const failures = evidence.get(id) || [];
+    const failures = kind === 'llm' ? llmFailures(id, stability) : evidence.get(id) || [];
     trust[id] =
       failures.length === 0
         ? {
             tier: 'proven',
             kind,
             reason:
-              'Clean record: every deterministic-harness assertion on its own criteria passed, ' +
-              'no crashes on the real-world fixtures, not a top noise source, and no rule of ' +
-              'it reports a finding the real-world audit calls false.',
+              kind === 'llm'
+                ? `Stability record: every rule has at least ${MIN_LLM_RUNS} runs agreeing to ` +
+                  `${MIN_LLM_AGREEMENT} with precision at or above ${MIN_LLM_PRECISION} ` +
+                  'against the fixture labels.'
+                : 'Clean record: every deterministic-harness assertion on its own criteria passed, ' +
+                  'no crashes on the real-world fixtures, not a top noise source, and no rule of ' +
+                  'it reports a finding the real-world audit calls false.',
           }
         : {
             tier: 'experimental',
@@ -236,4 +297,12 @@ function main() {
 
 if (require.main === module) main();
 
-module.exports = { derive, NOISE_LIMIT, MIN_JUDGED_FINDINGS };
+module.exports = {
+  derive,
+  llmFailures,
+  NOISE_LIMIT,
+  MIN_JUDGED_FINDINGS,
+  MIN_LLM_RUNS,
+  MIN_LLM_AGREEMENT,
+  MIN_LLM_PRECISION,
+};

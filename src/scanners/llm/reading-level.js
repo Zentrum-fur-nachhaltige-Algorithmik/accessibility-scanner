@@ -1,11 +1,18 @@
 /**
  * LLM Reading Level Scanner
- * Covers 3.1.5 Reading Level (Level AAA).
- * Checks that content does not exceed lower secondary reading level or that a
- * simplified version exists. EN uses Flesch, DE uses Wiener Sachtextformel.
+ * Covers 3.1.5 Reading Level (Level AAA) as page-level judgement.
+ *
+ * The readability numbers are measured here in code (sentence length,
+ * syllables per word, Flesch for English, Wiener Sachtextformel for German)
+ * and travel with the question as measurements. The model is never asked to
+ * estimate them: it answers whether a lower-secondary reader could follow the
+ * text and whether a simpler version or summary exists.
  */
 
 const LLMBaseScanner = require('./base');
+
+/** Below this, there is not enough prose to say anything about reading level. */
+const MIN_WORDS = 50;
 
 class LLMReadingLevelScanner extends LLMBaseScanner {
   constructor(llmClient) {
@@ -20,12 +27,128 @@ class LLMReadingLevelScanner extends LLMBaseScanner {
   }
 
   async scan(page, options = {}) {
-    // Pre-check: extract prose text and simplification mechanisms
-    const textData = await page.evaluate(() => {
+    const textData = await this._collectText(page);
+
+    if (textData.words.length < MIN_WORDS) {
+      return this.reviewResult([], {
+        criteriaChecked: ['3.1.5'],
+        skipped: 'insufficient text content to assess reading level',
+        totalWords: textData.words.length,
+      });
+    }
+
+    const measurements = {
+      lang: textData.lang || 'not declared',
+      ...this.readability(textData.words, textData.sentenceCount, textData.lang),
+      glossary: textData.hasGlossary,
+      simplifiedVersion: textData.hasSimplifiedVersion,
+      summarySection: textData.hasSummary,
+      inlineDefinitions: textData.hasDefinitions,
+    };
+
+    const prompt = `Judge this page against WCAG 2.2 criterion 3.1.5 (Reading Level, Level AAA).
+
+The criterion asks for a supplemental, easier version when the text requires reading ability beyond lower secondary education (roughly age 12 to 15).
+
+Two questions, both about MEANING, not about counting:
+
+1. Could a reader at lower secondary level follow the main content of this page: is the subject matter explained as it goes, or does it assume knowledge and vocabulary a general reader does not have?
+
+2. If it does assume that: does the page offer a way through anyway, that is a plain-language or "Einfache Sprache" version, a summary or abstract of the content, a glossary, or inline definitions of the terms it relies on?
+
+Report a finding ONLY when the answer to 1 is no AND the answer to 2 is no. Never report numbers: sentence length, syllable counts and readability indexes are measured elsewhere and are not your job. Never report navigation text, button labels or other UI chrome, and never report text that is unavoidably technical for its subject and defines its terms.
+
+**Page language:** ${textData.lang || 'not specified'}
+
+**Sample of the densest paragraphs:**
+${textData.longestParagraphs.map((p, i) => `[Paragraph ${i + 1}]: ${p.slice(0, 500)}`).join('\n\n')}
+
+Use criterion "3.1.5". Return violations as JSON; an empty array when a lower-secondary reader could follow the page or a simpler version exists.`;
+
+    const { violations: raw, summary: ctx } = await this.analyzePageChunked(page, prompt);
+    const needsReview = this.convertViolations(raw, { model: ctx.llmModel, measurements });
+
+    return this.reviewResult(needsReview, {
+      llmModel: ctx.llmModel || 'unknown',
+      criteriaChecked: ['3.1.5'],
+      analyzedFraction: ctx.analyzedFraction,
+      rawChars: ctx.rawChars,
+      skeletonChars: ctx.skeletonChars,
+      chunkCount: ctx.chunkCount,
+      truncated: ctx.truncated,
+      readability: measurements,
+    });
+  }
+
+  /**
+   * Readability of the page's own prose, in code.
+   *
+   * Flesch Reading Ease for English, Amstad's German Flesch plus the Wiener
+   * Sachtextformel (variant 1) for German: WSTF reads directly as a school
+   * grade, which is what 3.1.5's "lower secondary" threshold is stated in.
+   *
+   * @param {string[]} words
+   * @param {number} sentenceCount
+   * @param {string} lang - document language, may be empty
+   * @returns {Object} flat measurements
+   */
+  readability(words, sentenceCount, lang) {
+    const sentences = Math.max(1, sentenceCount);
+    const syllables = words.map((w) => this.countSyllables(w));
+    const totalSyllables = syllables.reduce((a, b) => a + b, 0);
+    const asl = words.length / sentences;
+    const asw = totalSyllables / words.length;
+    const round = (n) => Math.round(n * 10) / 10;
+
+    const out = {
+      totalWords: words.length,
+      totalSentences: sentences,
+      avgWordsPerSentence: round(asl),
+      avgSyllablesPerWord: Math.round(asw * 100) / 100,
+      longWordsPercent: round((words.filter((w) => w.length > 6).length / words.length) * 100),
+    };
+
+    if (/^de/i.test(lang || '')) {
+      const ms = (syllables.filter((s) => s >= 3).length / words.length) * 100;
+      const iw = (words.filter((w) => w.length > 6).length / words.length) * 100;
+      const es = (syllables.filter((s) => s === 1).length / words.length) * 100;
+      out.wienerSachtextformel = round(
+        0.1935 * ms + 0.1672 * asl + 0.1297 * iw - 0.0327 * es - 0.875
+      );
+      out.fleschDe = round(180 - asl - 58.5 * asw);
+      out.readabilityFormula = 'Wiener Sachtextformel 1 (school grade), Flesch-DE (Amstad)';
+    } else {
+      out.fleschReadingEase = round(206.835 - 1.015 * asl - 84.6 * asw);
+      out.fleschKincaidGrade = round(0.39 * asl + 11.8 * asw - 15.59);
+      out.readabilityFormula = 'Flesch Reading Ease, Flesch-Kincaid Grade Level';
+    }
+    return out;
+  }
+
+  /**
+   * Syllables of one word, by counting vowel groups. A heuristic, shared by
+   * the English and the German formulas: both count spoken syllables, and both
+   * indexes are read as bands rather than as exact values.
+   *
+   * @param {string} word
+   * @returns {number} at least 1
+   */
+  countSyllables(word) {
+    const w = word.toLowerCase().replace(/[^a-zà-öø-ÿ]/g, '');
+    if (!w) return 1;
+    const groups = w.match(/[aeiouyäöüà-æè-ïò-öù-ü]+/g);
+    let count = groups ? groups.length : 1;
+    // Silent final "e" in English ("more", "table"); never below one syllable.
+    if (/[^aeiou]e$/.test(w) && count > 1) count--;
+    return Math.max(1, count);
+  }
+
+  /** Main-content prose plus the simplification mechanisms the page offers. */
+  async _collectText(page) {
+    return page.evaluate(() => {
       const main = document.querySelector('main, [role="main"]') || document.body;
       const clone = main.cloneNode(true);
 
-      // Strip non-content elements
       clone
         .querySelectorAll(
           'nav, header, footer, script, style, noscript, ' +
@@ -34,12 +157,9 @@ class LLMReadingLevelScanner extends LLMBaseScanner {
         .forEach((el) => el.remove());
 
       const text = clone.textContent.replace(/\s+/g, ' ').trim();
-      const sentences = text.split(/[.!?]+/).filter((s) => s.trim().length > 10);
-      const words = text.split(/\s+/).filter((w) => w.length > 0);
-      const avgWordsPerSentence =
-        sentences.length > 0 ? Math.round(words.length / sentences.length) : 0;
+      const sentenceCount = text.split(/[.!?]+/).filter((s) => s.trim().length > 10).length;
+      const words = text.split(/\s+/).filter((w) => /\w/.test(w));
 
-      // Detect simplification mechanisms
       const hasGlossary = !!document.querySelector(
         '[class*="glossar" i], [id*="glossar" i], [class*="glossary" i], ' +
           '[id*="glossary" i], dl, [role="definition"]'
@@ -56,118 +176,23 @@ class LLMReadingLevelScanner extends LLMBaseScanner {
       );
       const hasDefinitions = document.querySelectorAll('dfn, abbr[title]').length > 2;
 
-      // Sample longest paragraphs (most likely to have readability issues)
-      const paragraphs = Array.from(clone.querySelectorAll('p, article, section > div'))
+      const longestParagraphs = Array.from(clone.querySelectorAll('p, article, section > div'))
         .map((p) => p.textContent.replace(/\s+/g, ' ').trim())
         .filter((t) => t.length > 100)
         .sort((a, b) => b.length - a.length)
         .slice(0, 5);
 
-      // Detect page language
-      const lang = document.documentElement.lang || '';
-
       return {
-        totalWords: words.length,
-        totalSentences: sentences.length,
-        avgWordsPerSentence,
+        words,
+        sentenceCount,
         hasGlossary,
         hasSimplifiedVersion,
         hasSummary,
         hasDefinitions,
-        longestParagraphs: paragraphs,
-        lang,
+        longestParagraphs,
+        lang: document.documentElement.lang || '',
       };
     });
-
-    // Short-circuit: too little content to assess
-    if (textData.totalWords < 50) {
-      return {
-        scannerId: this.id,
-        passed: true,
-        violations: [],
-        summary: {
-          totalIssues: 0,
-          note: 'Insufficient text content to assess reading level',
-        },
-      };
-    }
-
-    const prompt = `Check this HTML for WCAG 2.2 criterion 3.1.5 (Reading Level, Level AAA).
-
-This criterion requires that when text requires reading ability more advanced than lower secondary education level (approximately grade 7-9 / age 12-15), a supplemental version is provided that does not require advanced reading ability.
-
-**Page language:** ${textData.lang || 'not specified'}
-
-**Pre-analysis data:**
-- Total words: ${textData.totalWords}
-- Total sentences: ${textData.totalSentences}
-- Average words per sentence: ${textData.avgWordsPerSentence}
-- Glossary present: ${textData.hasGlossary}
-- Simplified/plain-language version present: ${textData.hasSimplifiedVersion}
-- Summary section present: ${textData.hasSummary}
-- Definitions (<dfn>, <abbr title>) present: ${textData.hasDefinitions}
-
-**Sample of densest paragraphs:**
-${textData.longestParagraphs.map((p, i) => `[Paragraph ${i + 1}]: ${p.slice(0, 500)}`).join('\n\n')}
-
-**Readability assessment guidelines (language-specific):**
-- For English text: Flesch Reading Ease below 50 or Flesch-Kincaid Grade Level above 9 indicates advanced reading level.
-- For German text: Wiener Sachtextformel (WSTF) above 10 or Flesch-DE below 40 indicates advanced reading level. Long compound words (Bandwurmwörter), deeply nested subclauses, and nominalization-heavy style are strong indicators.
-- For other languages: assess sentence complexity, jargon density, and clause nesting relative to secondary education level.
-
-**Indicators of advanced reading level** (flag only if MULTIPLE are present AND no simplification mechanism exists):
-- Dense academic, legal, medical, financial, or technical jargon throughout the main content
-- Average sentence length well above 25 words
-- Complex nested sentence structures with multiple subordinate clauses
-- Extensive domain-specific terminology without definitions
-- Passive voice and nominalizations dominating the text
-
-**A page PASSES 3.1.5 if ANY of the following are true:**
-- The main content text is written at or below lower secondary education level
-- A simplified or plain-language version is provided alongside complex text (e.g., a "Simple version" / "Einfache Sprache" section, a <details> with plain language, a glossary, or a toggle/link to a simplified version)
-- The content provides glossary terms, definitions (<dfn>), <abbr> with titles, or explanatory sections alongside complex text
-- The text is primarily proper names, titles, or unavoidable technical terms for the subject matter
-
-**Do NOT flag:**
-- Navigation text, button labels, or UI chrome
-- Content that is already at an appropriate reading level
-- Complex text that has an accompanying simplified version, glossary, or summary
-- Short snippets of complex text within otherwise simple content
-- Technical documentation aimed at professionals that provides adequate definitions
-
-CRITICAL: Only flag pages where the PRIMARY content is clearly above secondary education reading level AND no simplification mechanism whatsoever is provided. If there is a glossary, summary, plain-language alternative, or definition list, the page PASSES even if complex text is present.
-
-Return violations as JSON.`;
-
-    const { violations: raw, summary: ctx } = await this.analyzePageChunked(page, prompt);
-    const violations = this.convertViolations(raw);
-
-    return {
-      scannerId: this.id,
-      passed: violations.length === 0,
-      violations,
-      summary: {
-        totalIssues: violations.length,
-        llmModel: ctx.llmModel || 'unknown',
-        criteriaChecked: ['3.1.5'],
-        analyzedFraction: ctx.analyzedFraction,
-        rawChars: ctx.rawChars,
-        skeletonChars: ctx.skeletonChars,
-        chunkCount: ctx.chunkCount,
-        truncated: ctx.truncated,
-        textStats: {
-          totalWords: textData.totalWords,
-          avgWordsPerSentence: textData.avgWordsPerSentence,
-          lang: textData.lang,
-        },
-        simplificationMechanisms: {
-          glossary: textData.hasGlossary,
-          simplifiedVersion: textData.hasSimplifiedVersion,
-          summary: textData.hasSummary,
-          definitions: textData.hasDefinitions,
-        },
-      },
-    };
   }
 }
 

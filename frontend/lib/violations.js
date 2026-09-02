@@ -67,6 +67,19 @@ export function reviewMeasurements(violation) {
     .map(([key, value]) => [key, String(value)]);
 }
 
+/**
+ * What the producer said about the question: an LLM scanner's own evidence and
+ * the model id that wrote it. Flat [label, value] pairs, like the measurements.
+ */
+export function reviewContext(violation) {
+  const context = violation?.dossier?.context;
+  if (!context || typeof context !== 'object') return [];
+  const labels = { evidence: 'Evidence', model: 'Model', axeRuleId: 'axe rule' };
+  return Object.entries(context)
+    .filter(([, value]) => value !== null && value !== undefined && value !== '')
+    .map(([key, value]) => [labels[key] || key, String(value)]);
+}
+
 /** Mirrors normalizeSeverity() in src/report-generator.js. */
 export function normalizeSeverity(violation) {
   const raw = String(violation?.severity || violation?.impact || 'moderate').toLowerCase();
@@ -231,7 +244,7 @@ const SCANNER_NAMES = {
   'axe-core': 'axe-core',
 };
 
-/** 'label-in-name' -> 'Label in name'; 'llm-behavioral' -> 'LLM behavioral'. */
+/** 'label-in-name' -> 'Label in name'; 'llm-alt-quality' -> 'LLM alt quality'. */
 export function scannerLabel(scannerId) {
   if (!scannerId) return 'No module assigned';
   if (SCANNER_NAMES[scannerId]) return SCANNER_NAMES[scannerId];

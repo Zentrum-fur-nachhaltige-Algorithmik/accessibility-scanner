@@ -296,15 +296,12 @@
       "criteria": [
         "3.1.3",
         "3.1.4",
-        "3.1.6",
-        "2.4.9",
-        "2.4.10",
-        "1.3.6"
+        "2.4.10"
       ],
       "kind": "llm",
       "exclusive": false,
-      "trust": "proven",
-      "trustReason": "LLM scanner: measured by scripts/harness/llm.js (violation-level ground truth, German pair, injection and long-page robustness), not by the deterministic fixture harnesses."
+      "trust": "experimental",
+      "trustReason": "LLM scanner: no stability record (tests/data/harness/harness-llm.json is missing; run harness:llm --runs 3 --json)"
     },
     {
       "id": "llm-auth",
@@ -314,48 +311,19 @@
       ],
       "kind": "llm",
       "exclusive": false,
-      "trust": "proven",
-      "trustReason": "LLM scanner: measured by scripts/harness/llm.js (violation-level ground truth, German pair, injection and long-page robustness), not by the deterministic fixture harnesses."
-    },
-    {
-      "id": "llm-media-alternatives",
-      "criteria": [
-        "1.2.6",
-        "1.2.7",
-        "1.2.8",
-        "1.2.9"
-      ],
-      "kind": "llm",
-      "exclusive": false,
-      "trust": "proven",
-      "trustReason": "LLM scanner: measured by scripts/harness/llm.js (violation-level ground truth, German pair, injection and long-page robustness), not by the deterministic fixture harnesses."
+      "trust": "experimental",
+      "trustReason": "LLM scanner: no stability record (tests/data/harness/harness-llm.json is missing; run harness:llm --runs 3 --json)"
     },
     {
       "id": "llm-visual-presentation",
       "criteria": [
-        "1.4.7",
         "1.4.8",
         "1.4.9"
       ],
       "kind": "llm",
       "exclusive": false,
-      "trust": "proven",
-      "trustReason": "LLM scanner: measured by scripts/harness/llm.js (violation-level ground truth, German pair, injection and long-page robustness), not by the deterministic fixture harnesses."
-    },
-    {
-      "id": "llm-behavioral",
-      "criteria": [
-        "2.2.3",
-        "2.2.4",
-        "2.2.5",
-        "2.2.6",
-        "3.2.5",
-        "3.3.5"
-      ],
-      "kind": "llm",
-      "exclusive": false,
-      "trust": "proven",
-      "trustReason": "LLM scanner: measured by scripts/harness/llm.js (violation-level ground truth, German pair, injection and long-page robustness), not by the deterministic fixture harnesses."
+      "trust": "experimental",
+      "trustReason": "LLM scanner: no stability record (tests/data/harness/harness-llm.json is missing; run harness:llm --runs 3 --json)"
     },
     {
       "id": "llm-focus-appearance",
@@ -365,8 +333,8 @@
       ],
       "kind": "llm",
       "exclusive": false,
-      "trust": "proven",
-      "trustReason": "LLM scanner: measured by scripts/harness/llm.js (violation-level ground truth, German pair, injection and long-page robustness), not by the deterministic fixture harnesses."
+      "trust": "experimental",
+      "trustReason": "LLM scanner: no stability record (tests/data/harness/harness-llm.json is missing; run harness:llm --runs 3 --json)"
     },
     {
       "id": "llm-sensory-characteristics",
@@ -375,8 +343,8 @@
       ],
       "kind": "llm",
       "exclusive": false,
-      "trust": "proven",
-      "trustReason": "LLM scanner: measured by scripts/harness/llm.js (violation-level ground truth, German pair, injection and long-page robustness), not by the deterministic fixture harnesses."
+      "trust": "experimental",
+      "trustReason": "LLM scanner: no stability record (tests/data/harness/harness-llm.json is missing; run harness:llm --runs 3 --json)"
     },
     {
       "id": "llm-reading-level",
@@ -385,16 +353,16 @@
       ],
       "kind": "llm",
       "exclusive": false,
-      "trust": "proven",
-      "trustReason": "LLM scanner: measured by scripts/harness/llm.js (violation-level ground truth, German pair, injection and long-page robustness), not by the deterministic fixture harnesses."
+      "trust": "experimental",
+      "trustReason": "LLM scanner: no stability record (tests/data/harness/harness-llm.json is missing; run harness:llm --runs 3 --json)"
     },
     {
       "id": "llm-incomplete-reviewer",
       "criteria": [],
       "kind": "llm",
       "exclusive": false,
-      "trust": "proven",
-      "trustReason": "LLM scanner: measured by scripts/harness/llm.js (violation-level ground truth, German pair, injection and long-page robustness), not by the deterministic fixture harnesses."
+      "trust": "experimental",
+      "trustReason": "LLM scanner: no stability record (tests/data/harness/harness-llm.json is missing; run harness:llm --runs 3 --json)"
     },
     {
       "id": "llm-redundant-entry",
@@ -403,8 +371,8 @@
       ],
       "kind": "llm",
       "exclusive": false,
-      "trust": "proven",
-      "trustReason": "LLM scanner: measured by scripts/harness/llm.js (violation-level ground truth, German pair, injection and long-page robustness), not by the deterministic fixture harnesses."
+      "trust": "experimental",
+      "trustReason": "LLM scanner: no stability record (tests/data/harness/harness-llm.json is missing; run harness:llm --runs 3 --json)"
     },
     {
       "id": "llm-consistent-help",
@@ -413,8 +381,8 @@
       ],
       "kind": "llm",
       "exclusive": true,
-      "trust": "proven",
-      "trustReason": "LLM scanner: measured by scripts/harness/llm.js (violation-level ground truth, German pair, injection and long-page robustness), not by the deterministic fixture harnesses."
+      "trust": "experimental",
+      "trustReason": "LLM scanner: no stability record (tests/data/harness/harness-llm.json is missing; run harness:llm --runs 3 --json)"
     },
     {
       "id": "llm-alt-quality",
@@ -423,8 +391,8 @@
       ],
       "kind": "llm",
       "exclusive": false,
-      "trust": "proven",
-      "trustReason": "LLM scanner: measured by scripts/harness/llm.js (violation-level ground truth, German pair, injection and long-page robustness), not by the deterministic fixture harnesses."
+      "trust": "experimental",
+      "trustReason": "LLM scanner: no stability record (tests/data/harness/harness-llm.json is missing; run harness:llm --runs 3 --json)"
     }
   ],
   "rows": [
@@ -432,8 +400,11 @@
       "sc": "1.1.1",
       "level": "A",
       "title": "Non-text Content",
-      "mechanism": "hybrid:axe-core+llm-alt-quality",
-      "supporting": [],
+      "mechanism": "axe-core",
+      "how": "measured",
+      "supporting": [
+        "llm-alt-quality (experimental)"
+      ],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
@@ -477,14 +448,13 @@
       "sc": "1.2.1",
       "level": "A",
       "title": "Audio-only and Video-only (Prerecorded)",
-      "mechanism": "hybrid:axe-core+media-accessibility",
+      "mechanism": "deterministic:media-accessibility",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
-      "axeRules": [
-        "audio-caption"
-      ],
+      "axeRules": [],
       "deterministic": [
         "media-accessibility"
       ],
@@ -499,7 +469,6 @@
         ]
       },
       "harness": [
-        "axe-e2e",
         "concurrent"
       ],
       "outcome": {
@@ -516,6 +485,7 @@
       "level": "A",
       "title": "Captions (Prerecorded)",
       "mechanism": "hybrid:axe-core+media-accessibility",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -555,6 +525,7 @@
       "level": "A",
       "title": "Audio Description or Media Alternative (Prerecorded)",
       "mechanism": "deterministic:media-accessibility",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -590,6 +561,7 @@
       "level": "AA",
       "title": "Captions (Live)",
       "mechanism": "MANUAL",
+      "how": "manual",
       "supporting": [],
       "justification": "Captions (Live): requires a running live stream; a static page exposes no signal about whether a future broadcast will be captioned.",
       "isManual": true,
@@ -613,6 +585,7 @@
       "level": "AA",
       "title": "Audio Description (Prerecorded)",
       "mechanism": "deterministic:media-accessibility",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -647,16 +620,15 @@
       "sc": "1.2.6",
       "level": "AAA",
       "title": "Sign Language (Prerecorded)",
-      "mechanism": "llm:llm-media-alternatives",
+      "mechanism": "MANUAL",
+      "how": "manual",
       "supporting": [],
-      "justification": "",
-      "isManual": false,
+      "justification": "Sign Language (Recorded) (AAA): whether a recording carries a sign language interpretation is a property of the media track, not of the page markup.",
+      "isManual": true,
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [],
-      "llm": [
-        "llm-media-alternatives"
-      ],
+      "llm": [],
       "fixtures": {
         "good": [
           "good-media-aaa.html",
@@ -667,25 +639,22 @@
           "bad-media-alternatives-de.html"
         ]
       },
-      "harness": [
-        "llm"
-      ],
+      "harness": [],
       "outcome": null
     },
     {
       "sc": "1.2.7",
       "level": "AAA",
       "title": "Extended Audio Description (Prerecorded)",
-      "mechanism": "llm:llm-media-alternatives",
+      "mechanism": "MANUAL",
+      "how": "manual",
       "supporting": [],
-      "justification": "",
-      "isManual": false,
+      "justification": "Extended Audio Description (AAA): whether the pauses in a video carry enough description is a property of the audio track, not of the page markup.",
+      "isManual": true,
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [],
-      "llm": [
-        "llm-media-alternatives"
-      ],
+      "llm": [],
       "fixtures": {
         "good": [
           "good-media-aaa.html"
@@ -694,25 +663,22 @@
           "bad-media-aaa.html"
         ]
       },
-      "harness": [
-        "llm"
-      ],
+      "harness": [],
       "outcome": null
     },
     {
       "sc": "1.2.8",
       "level": "AAA",
       "title": "Media Alternative (Prerecorded)",
-      "mechanism": "llm:llm-media-alternatives",
+      "mechanism": "MANUAL",
+      "how": "manual",
       "supporting": [],
-      "justification": "",
-      "isManual": false,
+      "justification": "Media Alternative (Recorded) (AAA): whether a linked document is a full alternative for the recording can only be decided by reading both.",
+      "isManual": true,
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [],
-      "llm": [
-        "llm-media-alternatives"
-      ],
+      "llm": [],
       "fixtures": {
         "good": [
           "good-media-aaa.html",
@@ -723,25 +689,22 @@
           "bad-media-alternatives-de.html"
         ]
       },
-      "harness": [
-        "llm"
-      ],
+      "harness": [],
       "outcome": null
     },
     {
       "sc": "1.2.9",
       "level": "AAA",
       "title": "Audio-only (Live)",
-      "mechanism": "llm:llm-media-alternatives",
+      "mechanism": "MANUAL",
+      "how": "manual",
       "supporting": [],
-      "justification": "",
-      "isManual": false,
+      "justification": "Audio-only (Live) (AAA): requires a running live stream; a static page exposes no signal about whether a future broadcast carries a text alternative.",
+      "isManual": true,
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [],
-      "llm": [
-        "llm-media-alternatives"
-      ],
+      "llm": [],
       "fixtures": {
         "good": [
           "good-media-aaa.html"
@@ -750,9 +713,7 @@
           "bad-media-aaa.html"
         ]
       },
-      "harness": [
-        "llm"
-      ],
+      "harness": [],
       "outcome": null
     },
     {
@@ -760,6 +721,7 @@
       "level": "A",
       "title": "Info and Relationships",
       "mechanism": "axe-core",
+      "how": "measured",
       "supporting": [
         "screen-reader (experimental)"
       ],
@@ -774,9 +736,6 @@
         "dlitem",
         "list",
         "listitem",
-        "p-as-heading",
-        "table-fake-caption",
-        "td-has-header",
         "td-headers-attr",
         "th-has-data-cells"
       ],
@@ -823,6 +782,7 @@
       "level": "A",
       "title": "Meaningful Sequence",
       "mechanism": "MANUAL",
+      "how": "manual",
       "supporting": [],
       "justification": "Meaningful Sequence: the correct reading order is defined by authorial meaning; DOM-vs-visual order mismatches are routinely intentional, so any static heuristic is a noise generator. axe-core likewise ships no 1.3.2 rule.",
       "isManual": true,
@@ -845,11 +805,12 @@
       "sc": "1.3.3",
       "level": "A",
       "title": "Sensory Characteristics",
-      "mechanism": "llm:llm-sensory-characteristics",
+      "mechanism": "experimental:llm-sensory-characteristics",
+      "how": "adjudicated",
       "supporting": [],
-      "justification": "",
+      "justification": "Only experimental scanners cover this criterion: llm-sensory-characteristics: LLM scanner: no stability record (tests/data/harness/harness-llm.json is missing; run harness:llm --runs 3 --json)",
       "isManual": false,
-      "isExperimentalOnly": false,
+      "isExperimentalOnly": true,
       "axeRules": [],
       "deterministic": [],
       "llm": [
@@ -876,14 +837,13 @@
       "sc": "1.3.4",
       "level": "AA",
       "title": "Orientation",
-      "mechanism": "hybrid:axe-core+orientation",
+      "mechanism": "deterministic:orientation",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
-      "axeRules": [
-        "css-orientation-lock"
-      ],
+      "axeRules": [],
       "deterministic": [
         "orientation"
       ],
@@ -898,7 +858,6 @@
         ]
       },
       "harness": [
-        "axe-e2e",
         "concurrent"
       ],
       "outcome": {
@@ -915,6 +874,7 @@
       "level": "AA",
       "title": "Identify Input Purpose",
       "mechanism": "hybrid:axe-core+input-purpose",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -953,16 +913,15 @@
       "sc": "1.3.6",
       "level": "AAA",
       "title": "Identify Purpose",
-      "mechanism": "llm:llm-semantic-text",
+      "mechanism": "MANUAL",
+      "how": "manual",
       "supporting": [],
-      "justification": "",
-      "isManual": false,
+      "justification": "Identify Purpose (AAA): asks for personalization semantics (WAI-ADAPT style annotations) that no scanner here measures; landmark structure is 1.3.1, not this.",
+      "isManual": true,
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [],
-      "llm": [
-        "llm-semantic-text"
-      ],
+      "llm": [],
       "fixtures": {
         "good": [
           "good-identify-purpose.html"
@@ -971,9 +930,7 @@
           "bad-identify-purpose.html"
         ]
       },
-      "harness": [
-        "llm"
-      ],
+      "harness": [],
       "outcome": null
     },
     {
@@ -981,6 +938,7 @@
       "level": "A",
       "title": "Use of Color",
       "mechanism": "hybrid:axe-core+use-of-color",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -1021,6 +979,7 @@
       "level": "A",
       "title": "Audio Control",
       "mechanism": "axe-core",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -1048,6 +1007,7 @@
       "level": "AA",
       "title": "Contrast (Minimum)",
       "mechanism": "axe-core",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -1081,6 +1041,7 @@
       "level": "AA",
       "title": "Resize Text",
       "mechanism": "hybrid:axe-core+text-resize",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -1121,6 +1082,7 @@
       "level": "AA",
       "title": "Images of Text",
       "mechanism": "deterministic:images-of-text",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -1155,14 +1117,13 @@
       "sc": "1.4.6",
       "level": "AAA",
       "title": "Contrast (Enhanced)",
-      "mechanism": "hybrid:axe-core+color-contrast",
+      "mechanism": "deterministic:color-contrast",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
-      "axeRules": [
-        "color-contrast-enhanced"
-      ],
+      "axeRules": [],
       "deterministic": [
         "color-contrast"
       ],
@@ -1176,7 +1137,6 @@
         ]
       },
       "harness": [
-        "axe-e2e",
         "concurrent"
       ],
       "outcome": {
@@ -1192,16 +1152,15 @@
       "sc": "1.4.7",
       "level": "AAA",
       "title": "Low or No Background Audio",
-      "mechanism": "llm:llm-visual-presentation",
+      "mechanism": "MANUAL",
+      "how": "manual",
       "supporting": [],
-      "justification": "",
-      "isManual": false,
+      "justification": "Low or No Background Audio (AAA): whether speech has background sound behind it, and 20 dB below it, is a property of the audio signal, not of the page.",
+      "isManual": true,
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [],
-      "llm": [
-        "llm-visual-presentation"
-      ],
+      "llm": [],
       "fixtures": {
         "good": [
           "good-low-background-audio.html"
@@ -1210,20 +1169,19 @@
           "bad-low-background-audio.html"
         ]
       },
-      "harness": [
-        "llm"
-      ],
+      "harness": [],
       "outcome": null
     },
     {
       "sc": "1.4.8",
       "level": "AAA",
       "title": "Visual Presentation",
-      "mechanism": "llm:llm-visual-presentation",
+      "mechanism": "experimental:llm-visual-presentation",
+      "how": "adjudicated",
       "supporting": [],
-      "justification": "",
+      "justification": "Only experimental scanners cover this criterion: llm-visual-presentation: LLM scanner: no stability record (tests/data/harness/harness-llm.json is missing; run harness:llm --runs 3 --json)",
       "isManual": false,
-      "isExperimentalOnly": false,
+      "isExperimentalOnly": true,
       "axeRules": [],
       "deterministic": [],
       "llm": [
@@ -1248,8 +1206,11 @@
       "sc": "1.4.9",
       "level": "AAA",
       "title": "Images of Text (No Exception)",
-      "mechanism": "hybrid:images-of-text+llm-visual-presentation",
-      "supporting": [],
+      "mechanism": "deterministic:images-of-text",
+      "how": "measured",
+      "supporting": [
+        "llm-visual-presentation (experimental)"
+      ],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
@@ -1287,6 +1248,7 @@
       "level": "AA",
       "title": "Reflow",
       "mechanism": "deterministic:responsive-design",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -1326,6 +1288,7 @@
       "level": "AA",
       "title": "Non-text Contrast",
       "mechanism": "deterministic:nontext-contrast",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -1364,6 +1327,7 @@
       "level": "AA",
       "title": "Text Spacing",
       "mechanism": "hybrid:axe-core+responsive-design",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -1404,6 +1368,7 @@
       "level": "AA",
       "title": "Content on Hover or Focus",
       "mechanism": "deterministic:hover-focus-content",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -1442,6 +1407,7 @@
       "level": "A",
       "title": "Keyboard",
       "mechanism": "hybrid:axe-core+keyboard-navigation",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -1491,6 +1457,7 @@
       "level": "A",
       "title": "No Keyboard Trap",
       "mechanism": "deterministic:keyboard-navigation",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -1527,6 +1494,7 @@
       "level": "AAA",
       "title": "Keyboard (No Exception)",
       "mechanism": "axe-core",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -1554,6 +1522,7 @@
       "level": "A",
       "title": "Character Key Shortcuts",
       "mechanism": "deterministic:keyboard-navigation",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -1589,6 +1558,7 @@
       "level": "A",
       "title": "Timing Adjustable",
       "mechanism": "hybrid:axe-core+timing-controls",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -1627,6 +1597,7 @@
       "level": "A",
       "title": "Pause, Stop, Hide",
       "mechanism": "hybrid:axe-core+timing-controls",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -1666,16 +1637,15 @@
       "sc": "2.2.3",
       "level": "AAA",
       "title": "No Timing",
-      "mechanism": "llm:llm-behavioral",
+      "mechanism": "MANUAL",
+      "how": "manual",
       "supporting": [],
-      "justification": "",
-      "isManual": false,
+      "justification": "No Timing (AAA): a time limit on user activity shows up while the page runs; it needs state interaction and observation, not a reading of the markup.",
+      "isManual": true,
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [],
-      "llm": [
-        "llm-behavioral"
-      ],
+      "llm": [],
       "fixtures": {
         "good": [
           "good-behavioral-de.html",
@@ -1686,27 +1656,22 @@
           "bad-timing-aaa.html"
         ]
       },
-      "harness": [
-        "llm"
-      ],
+      "harness": [],
       "outcome": null
     },
     {
       "sc": "2.2.4",
       "level": "AAA",
       "title": "Interruptions",
-      "mechanism": "hybrid:axe-core+llm-behavioral",
+      "mechanism": "MANUAL",
+      "how": "manual",
       "supporting": [],
-      "justification": "",
-      "isManual": false,
+      "justification": "Interruptions (AAA): whether an interruption can be postponed is runtime behaviour; axe ships meta-refresh-no-exceptions disabled, so nothing runs for it.",
+      "isManual": true,
       "isExperimentalOnly": false,
-      "axeRules": [
-        "meta-refresh-no-exceptions"
-      ],
+      "axeRules": [],
       "deterministic": [],
-      "llm": [
-        "llm-behavioral"
-      ],
+      "llm": [],
       "fixtures": {
         "good": [
           "good-timing-aaa.html"
@@ -1715,26 +1680,22 @@
           "bad-timing-aaa.html"
         ]
       },
-      "harness": [
-        "axe-e2e",
-        "llm"
-      ],
+      "harness": [],
       "outcome": null
     },
     {
       "sc": "2.2.5",
       "level": "AAA",
       "title": "Re-authenticating",
-      "mechanism": "llm:llm-behavioral",
+      "mechanism": "MANUAL",
+      "how": "manual",
       "supporting": [],
-      "justification": "",
-      "isManual": false,
+      "justification": "Re-authentication (AAA): whether data survives a re-login is server and session behaviour that a single page load does not expose.",
+      "isManual": true,
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [],
-      "llm": [
-        "llm-behavioral"
-      ],
+      "llm": [],
       "fixtures": {
         "good": [
           "good-timing-aaa.html"
@@ -1743,25 +1704,22 @@
           "bad-timing-aaa.html"
         ]
       },
-      "harness": [
-        "llm"
-      ],
+      "harness": [],
       "outcome": null
     },
     {
       "sc": "2.2.6",
       "level": "AAA",
       "title": "Timeouts",
-      "mechanism": "llm:llm-behavioral",
+      "mechanism": "MANUAL",
+      "how": "manual",
       "supporting": [],
-      "justification": "",
-      "isManual": false,
+      "justification": "Timeouts (AAA): whether an inactivity timeout discards user data needs state interaction over time, not a static reading.",
+      "isManual": true,
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [],
-      "llm": [
-        "llm-behavioral"
-      ],
+      "llm": [],
       "fixtures": {
         "good": [
           "good-timing-aaa.html"
@@ -1770,9 +1728,7 @@
           "bad-timing-aaa.html"
         ]
       },
-      "harness": [
-        "llm"
-      ],
+      "harness": [],
       "outcome": null
     },
     {
@@ -1780,6 +1736,7 @@
       "level": "A",
       "title": "Three Flashes or Below Threshold",
       "mechanism": "deterministic:seizure-prevention",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -1815,6 +1772,7 @@
       "level": "AAA",
       "title": "Three Flashes",
       "mechanism": "deterministic:seizure-prevention",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -1850,6 +1808,7 @@
       "level": "AAA",
       "title": "Animation from Interactions",
       "mechanism": "deterministic:seizure-prevention",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -1884,6 +1843,7 @@
       "level": "A",
       "title": "Bypass Blocks",
       "mechanism": "axe-core",
+      "how": "measured",
       "supporting": [
         "screen-reader (experimental)"
       ],
@@ -1929,6 +1889,7 @@
       "level": "A",
       "title": "Page Titled",
       "mechanism": "hybrid:axe-core+dynamic-spa",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -1968,6 +1929,7 @@
       "level": "A",
       "title": "Focus Order",
       "mechanism": "deterministic:focus-management",
+      "how": "measured",
       "supporting": [
         "dynamic-spa"
       ],
@@ -2012,6 +1974,7 @@
       "level": "A",
       "title": "Link Purpose (In Context)",
       "mechanism": "hybrid:axe-core+page-structure",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -2053,6 +2016,7 @@
       "level": "AA",
       "title": "Multiple Ways",
       "mechanism": "deterministic:multiple-ways",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -2089,6 +2053,7 @@
       "level": "AA",
       "title": "Headings and Labels",
       "mechanism": "MANUAL",
+      "how": "manual",
       "supporting": [],
       "justification": "Headings and Labels: whether a heading or a label describes its topic is a judgement about meaning. An empty heading is axe-core `empty-heading` and an unnamed control is axe-core `label`; what is left needs a reader. axe-core ships no 2.4.6 rule either.",
       "isManual": true,
@@ -2113,6 +2078,7 @@
       "level": "AA",
       "title": "Focus Visible",
       "mechanism": "deterministic:focus-management",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -2152,6 +2118,7 @@
       "level": "AAA",
       "title": "Location",
       "mechanism": "MANUAL",
+      "how": "manual",
       "supporting": [],
       "justification": "Location (AAA): whether a user can determine their position requires the surrounding set of pages and its information architecture, not one page.",
       "isManual": true,
@@ -2174,22 +2141,17 @@
       "sc": "2.4.9",
       "level": "AAA",
       "title": "Link Purpose (Link Only)",
-      "mechanism": "hybrid:axe-core+page-structure",
-      "supporting": [
-        "llm-semantic-text"
-      ],
+      "mechanism": "deterministic:page-structure",
+      "how": "measured",
+      "supporting": [],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
-      "axeRules": [
-        "identical-links-same-purpose"
-      ],
+      "axeRules": [],
       "deterministic": [
         "page-structure"
       ],
-      "llm": [
-        "llm-semantic-text"
-      ],
+      "llm": [],
       "fixtures": {
         "good": [
           "good-link-purpose-in-context.html",
@@ -2204,9 +2166,7 @@
         ]
       },
       "harness": [
-        "axe-e2e",
-        "concurrent",
-        "llm"
+        "concurrent"
       ],
       "outcome": {
         "tp": true,
@@ -2221,11 +2181,12 @@
       "sc": "2.4.10",
       "level": "AAA",
       "title": "Section Headings",
-      "mechanism": "llm:llm-semantic-text",
+      "mechanism": "experimental:llm-semantic-text",
+      "how": "page-judgement",
       "supporting": [],
-      "justification": "",
+      "justification": "Only experimental scanners cover this criterion: llm-semantic-text: LLM scanner: no stability record (tests/data/harness/harness-llm.json is missing; run harness:llm --runs 3 --json)",
       "isManual": false,
-      "isExperimentalOnly": false,
+      "isExperimentalOnly": true,
       "axeRules": [],
       "deterministic": [],
       "llm": [
@@ -2249,6 +2210,7 @@
       "level": "AA",
       "title": "Focus Not Obscured (Minimum)",
       "mechanism": "deterministic:focus-management",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -2284,11 +2246,12 @@
       "sc": "2.4.12",
       "level": "AAA",
       "title": "Focus Not Obscured (Enhanced)",
-      "mechanism": "llm:llm-focus-appearance",
+      "mechanism": "experimental:llm-focus-appearance",
+      "how": "adjudicated",
       "supporting": [],
-      "justification": "",
+      "justification": "Only experimental scanners cover this criterion: llm-focus-appearance: LLM scanner: no stability record (tests/data/harness/harness-llm.json is missing; run harness:llm --runs 3 --json)",
       "isManual": false,
-      "isExperimentalOnly": false,
+      "isExperimentalOnly": true,
       "axeRules": [],
       "deterministic": [],
       "llm": [
@@ -2311,11 +2274,12 @@
       "sc": "2.4.13",
       "level": "AAA",
       "title": "Focus Appearance",
-      "mechanism": "llm:llm-focus-appearance",
+      "mechanism": "experimental:llm-focus-appearance",
+      "how": "adjudicated",
       "supporting": [],
-      "justification": "",
+      "justification": "Only experimental scanners cover this criterion: llm-focus-appearance: LLM scanner: no stability record (tests/data/harness/harness-llm.json is missing; run harness:llm --runs 3 --json)",
       "isManual": false,
-      "isExperimentalOnly": false,
+      "isExperimentalOnly": true,
       "axeRules": [],
       "deterministic": [],
       "llm": [
@@ -2341,6 +2305,7 @@
       "level": "A",
       "title": "Pointer Gestures",
       "mechanism": "deterministic:input-modalities",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -2377,6 +2342,7 @@
       "level": "A",
       "title": "Pointer Cancellation",
       "mechanism": "deterministic:input-modalities",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -2412,14 +2378,13 @@
       "sc": "2.5.3",
       "level": "A",
       "title": "Label in Name",
-      "mechanism": "hybrid:axe-core+label-in-name",
+      "mechanism": "deterministic:label-in-name",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
-      "axeRules": [
-        "label-content-name-mismatch"
-      ],
+      "axeRules": [],
       "deterministic": [
         "label-in-name"
       ],
@@ -2435,7 +2400,6 @@
         ]
       },
       "harness": [
-        "axe-e2e",
         "concurrent",
         "golden"
       ],
@@ -2453,6 +2417,7 @@
       "level": "A",
       "title": "Motion Actuation",
       "mechanism": "deterministic:input-modalities",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -2489,6 +2454,7 @@
       "level": "AAA",
       "title": "Target Size (Enhanced)",
       "mechanism": "MANUAL",
+      "how": "manual",
       "supporting": [],
       "justification": "Target Size (Enhanced) (AAA): the AA minimum (2.5.8, 24x24 with the spacing exception) is automated in input-modalities; the 44x44 AAA size is a design review item.",
       "isManual": true,
@@ -2512,6 +2478,7 @@
       "level": "AAA",
       "title": "Concurrent Input Mechanisms",
       "mechanism": "deterministic:concurrent-input",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -2547,6 +2514,7 @@
       "level": "AA",
       "title": "Dragging Movements",
       "mechanism": "deterministic:input-modalities",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -2581,14 +2549,13 @@
       "sc": "2.5.8",
       "level": "AA",
       "title": "Target Size (Minimum)",
-      "mechanism": "hybrid:axe-core+input-modalities",
+      "mechanism": "deterministic:input-modalities",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
       "isExperimentalOnly": false,
-      "axeRules": [
-        "target-size"
-      ],
+      "axeRules": [],
       "deterministic": [
         "input-modalities"
       ],
@@ -2606,7 +2573,6 @@
         ]
       },
       "harness": [
-        "axe-e2e",
         "exclusive",
         "golden"
       ],
@@ -2624,6 +2590,7 @@
       "level": "A",
       "title": "Language of Page",
       "mechanism": "axe-core",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -2654,6 +2621,7 @@
       "level": "AA",
       "title": "Language of Parts",
       "mechanism": "axe-core",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -2682,11 +2650,12 @@
       "sc": "3.1.3",
       "level": "AAA",
       "title": "Unusual Words",
-      "mechanism": "llm:llm-semantic-text",
+      "mechanism": "experimental:llm-semantic-text",
+      "how": "page-judgement",
       "supporting": [],
-      "justification": "",
+      "justification": "Only experimental scanners cover this criterion: llm-semantic-text: LLM scanner: no stability record (tests/data/harness/harness-llm.json is missing; run harness:llm --runs 3 --json)",
       "isManual": false,
-      "isExperimentalOnly": false,
+      "isExperimentalOnly": true,
       "axeRules": [],
       "deterministic": [],
       "llm": [
@@ -2711,11 +2680,12 @@
       "sc": "3.1.4",
       "level": "AAA",
       "title": "Abbreviations",
-      "mechanism": "llm:llm-semantic-text",
+      "mechanism": "experimental:llm-semantic-text",
+      "how": "page-judgement",
       "supporting": [],
-      "justification": "",
+      "justification": "Only experimental scanners cover this criterion: llm-semantic-text: LLM scanner: no stability record (tests/data/harness/harness-llm.json is missing; run harness:llm --runs 3 --json)",
       "isManual": false,
-      "isExperimentalOnly": false,
+      "isExperimentalOnly": true,
       "axeRules": [],
       "deterministic": [],
       "llm": [
@@ -2740,11 +2710,12 @@
       "sc": "3.1.5",
       "level": "AAA",
       "title": "Reading Level",
-      "mechanism": "llm:llm-reading-level",
+      "mechanism": "experimental:llm-reading-level",
+      "how": "page-judgement",
       "supporting": [],
-      "justification": "",
+      "justification": "Only experimental scanners cover this criterion: llm-reading-level: LLM scanner: no stability record (tests/data/harness/harness-llm.json is missing; run harness:llm --runs 3 --json)",
       "isManual": false,
-      "isExperimentalOnly": false,
+      "isExperimentalOnly": true,
       "axeRules": [],
       "deterministic": [],
       "llm": [
@@ -2767,16 +2738,15 @@
       "sc": "3.1.6",
       "level": "AAA",
       "title": "Pronunciation",
-      "mechanism": "llm:llm-semantic-text",
+      "mechanism": "MANUAL",
+      "how": "manual",
       "supporting": [],
-      "justification": "",
-      "isManual": false,
+      "justification": "Pronunciation (AAA): whether a word is ambiguous in a way that changes meaning is a reading of the text in its language; the page carries no signal for it.",
+      "isManual": true,
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [],
-      "llm": [
-        "llm-semantic-text"
-      ],
+      "llm": [],
       "fixtures": {
         "good": [
           "good-language-aaa.html"
@@ -2785,9 +2755,7 @@
           "bad-language-aaa.html"
         ]
       },
-      "harness": [
-        "llm"
-      ],
+      "harness": [],
       "outcome": null
     },
     {
@@ -2795,6 +2763,7 @@
       "level": "A",
       "title": "On Focus",
       "mechanism": "deterministic:predictable-navigation",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -2832,6 +2801,7 @@
       "level": "A",
       "title": "On Input",
       "mechanism": "deterministic:predictable-navigation",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -2869,6 +2839,7 @@
       "level": "AA",
       "title": "Consistent Navigation",
       "mechanism": "deterministic:predictable-navigation",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -2903,6 +2874,7 @@
       "level": "AA",
       "title": "Consistent Identification",
       "mechanism": "deterministic:predictable-navigation",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -2940,18 +2912,15 @@
       "sc": "3.2.5",
       "level": "AAA",
       "title": "Change on Request",
-      "mechanism": "hybrid:axe-core+llm-behavioral",
+      "mechanism": "MANUAL",
+      "how": "manual",
       "supporting": [],
-      "justification": "",
-      "isManual": false,
+      "justification": "Change on Request (AAA): an automatic context change happens at runtime; axe ships meta-refresh-no-exceptions disabled, so nothing runs for it either.",
+      "isManual": true,
       "isExperimentalOnly": false,
-      "axeRules": [
-        "meta-refresh-no-exceptions"
-      ],
+      "axeRules": [],
       "deterministic": [],
-      "llm": [
-        "llm-behavioral"
-      ],
+      "llm": [],
       "fixtures": {
         "good": [
           "good-behavioral-de.html",
@@ -2962,21 +2931,19 @@
           "bad-change-on-request.html"
         ]
       },
-      "harness": [
-        "axe-e2e",
-        "llm"
-      ],
+      "harness": [],
       "outcome": null
     },
     {
       "sc": "3.2.6",
       "level": "A",
       "title": "Consistent Help",
-      "mechanism": "llm:llm-consistent-help",
+      "mechanism": "experimental:llm-consistent-help",
+      "how": "adjudicated",
       "supporting": [],
-      "justification": "",
+      "justification": "Only experimental scanners cover this criterion: llm-consistent-help: LLM scanner: no stability record (tests/data/harness/harness-llm.json is missing; run harness:llm --runs 3 --json)",
       "isManual": false,
-      "isExperimentalOnly": false,
+      "isExperimentalOnly": true,
       "axeRules": [],
       "deterministic": [],
       "llm": [
@@ -3000,6 +2967,7 @@
       "level": "A",
       "title": "Error Identification",
       "mechanism": "deterministic:error-handling",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -3037,6 +3005,7 @@
       "level": "A",
       "title": "Labels or Instructions",
       "mechanism": "hybrid:axe-core+error-handling",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -3081,6 +3050,7 @@
       "level": "AA",
       "title": "Error Suggestion",
       "mechanism": "deterministic:error-handling",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
@@ -3118,6 +3088,7 @@
       "level": "AA",
       "title": "Error Prevention (Legal, Financial, Data)",
       "mechanism": "MANUAL",
+      "how": "manual",
       "supporting": [],
       "justification": "Error Prevention (Legal, Financial, Data): the criterion applies only to pages that commit the user legally or financially, and is met by reversibility, checking or confirmation, all of which are server-side behaviour a static page does not expose.",
       "isManual": true,
@@ -3141,16 +3112,15 @@
       "sc": "3.3.5",
       "level": "AAA",
       "title": "Help",
-      "mechanism": "llm:llm-behavioral",
+      "mechanism": "MANUAL",
+      "how": "manual",
       "supporting": [],
-      "justification": "",
-      "isManual": false,
+      "justification": "Help (AAA): whether help is context-sensitive for the field that needs it is a judgement about the process, and the help may live behind an interaction.",
+      "isManual": true,
       "isExperimentalOnly": false,
       "axeRules": [],
       "deterministic": [],
-      "llm": [
-        "llm-behavioral"
-      ],
+      "llm": [],
       "fixtures": {
         "good": [
           "good-behavioral-de.html",
@@ -3161,9 +3131,7 @@
           "bad-help-aaa.html"
         ]
       },
-      "harness": [
-        "llm"
-      ],
+      "harness": [],
       "outcome": null
     },
     {
@@ -3171,6 +3139,7 @@
       "level": "AAA",
       "title": "Error Prevention (All)",
       "mechanism": "MANUAL",
+      "how": "manual",
       "supporting": [],
       "justification": "Error Prevention (All) (AAA): reversibility, checkability and confirmation of a submission is server-side behaviour that is not observable from the page.",
       "isManual": true,
@@ -3193,11 +3162,12 @@
       "sc": "3.3.7",
       "level": "A",
       "title": "Redundant Entry",
-      "mechanism": "llm:llm-redundant-entry",
+      "mechanism": "experimental:llm-redundant-entry",
+      "how": "adjudicated",
       "supporting": [],
-      "justification": "",
+      "justification": "Only experimental scanners cover this criterion: llm-redundant-entry: LLM scanner: no stability record (tests/data/harness/harness-llm.json is missing; run harness:llm --runs 3 --json)",
       "isManual": false,
-      "isExperimentalOnly": false,
+      "isExperimentalOnly": true,
       "axeRules": [],
       "deterministic": [],
       "llm": [
@@ -3220,11 +3190,12 @@
       "sc": "3.3.8",
       "level": "AA",
       "title": "Accessible Authentication (Minimum)",
-      "mechanism": "llm:llm-auth",
+      "mechanism": "experimental:llm-auth",
+      "how": "adjudicated",
       "supporting": [],
-      "justification": "",
+      "justification": "Only experimental scanners cover this criterion: llm-auth: LLM scanner: no stability record (tests/data/harness/harness-llm.json is missing; run harness:llm --runs 3 --json)",
       "isManual": false,
-      "isExperimentalOnly": false,
+      "isExperimentalOnly": true,
       "axeRules": [],
       "deterministic": [],
       "llm": [
@@ -3249,11 +3220,12 @@
       "sc": "3.3.9",
       "level": "AAA",
       "title": "Accessible Authentication (Enhanced)",
-      "mechanism": "llm:llm-auth",
+      "mechanism": "experimental:llm-auth",
+      "how": "adjudicated",
       "supporting": [],
-      "justification": "",
+      "justification": "Only experimental scanners cover this criterion: llm-auth: LLM scanner: no stability record (tests/data/harness/harness-llm.json is missing; run harness:llm --runs 3 --json)",
       "isManual": false,
-      "isExperimentalOnly": false,
+      "isExperimentalOnly": true,
       "axeRules": [],
       "deterministic": [],
       "llm": [
@@ -3277,6 +3249,7 @@
       "level": "REMOVED",
       "title": "Parsing",
       "mechanism": "NOT-APPLICABLE-STATIC",
+      "how": "manual",
       "supporting": [],
       "justification": "Parsing: removed from WCAG 2.2; retained in the list only so the numbering stays complete. Not a conformance requirement any more.",
       "isManual": true,
@@ -3301,6 +3274,7 @@
       "level": "A",
       "title": "Name, Role, Value",
       "mechanism": "axe-core",
+      "how": "measured",
       "supporting": [
         "advanced-aria (experimental)"
       ],
@@ -3319,7 +3293,6 @@
         "aria-input-field-name",
         "aria-prohibited-attr",
         "aria-required-attr",
-        "aria-roledescription",
         "aria-roles",
         "aria-toggle-field-name",
         "aria-tooltip-name",
@@ -3383,6 +3356,7 @@
       "level": "AA",
       "title": "Status Messages",
       "mechanism": "deterministic:status-messages",
+      "how": "measured",
       "supporting": [],
       "justification": "",
       "isManual": false,
